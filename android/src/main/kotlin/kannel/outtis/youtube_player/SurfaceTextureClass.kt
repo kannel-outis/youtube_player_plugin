@@ -9,11 +9,21 @@ class SurfaceTextureManagerClass( private val binding: FlutterPlugin.FlutterPlug
 
      private var surfaceEntry: TextureRegistry.SurfaceTextureEntry? = null
 
+    private var surfaceTexture: SurfaceTexture? = null
+
+    fun getSurfaceEntry():TextureRegistry.SurfaceTextureEntry{
+        return surfaceEntry!!
+    }
+
+    fun getsurfaceTexture():SurfaceTexture{
+        return surfaceTexture!!
+    }
+
     fun initState(width:Double,  height: Double):Long{
         textureRegistry = binding.textureRegistry
         surfaceEntry = textureRegistry!!.createSurfaceTexture()
-        val surfaceTexture: SurfaceTexture = surfaceEntry!!.surfaceTexture()
-        surfaceTexture.setDefaultBufferSize(width.toInt(), height.toInt())
+        surfaceTexture = surfaceEntry!!.surfaceTexture()
+        surfaceTexture!!.setDefaultBufferSize(width.toInt(), height.toInt())
 
         return surfaceEntry!!.id()
 
