@@ -8,7 +8,7 @@ class EventSink : EventChannel.EventSink{
     private var event:Any? = null
     private var error:EventError? = null
 
-    fun setEventSinkAndReset(newSink:EventChannel.EventSink): Unit{
+    fun setEventSinkAndReset(newSink:EventChannel.EventSink?): Unit{
         this.eventSink = newSink
         resetStream()
     }

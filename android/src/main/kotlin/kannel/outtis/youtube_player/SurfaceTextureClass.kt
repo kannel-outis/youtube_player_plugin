@@ -5,7 +5,6 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.view.TextureRegistry
 
 class SurfaceTextureManagerClass( private val binding: FlutterPlugin.FlutterPluginBinding) {
-    private var textureRegistry:TextureRegistry? = null
 
      private var surfaceEntry: TextureRegistry.SurfaceTextureEntry? = null
 
@@ -15,25 +14,24 @@ class SurfaceTextureManagerClass( private val binding: FlutterPlugin.FlutterPlug
         return surfaceEntry!!
     }
 
-    fun getsurfaceTexture():SurfaceTexture{
+    fun getSurfaceTexture():SurfaceTexture{
         return surfaceTexture!!
     }
 
-    fun initState(width:Double,  height: Double):Long{
-        textureRegistry = binding.textureRegistry
-        surfaceEntry = textureRegistry!!.createSurfaceTexture()
+    fun initSurface():Long{
+        surfaceEntry = binding.textureRegistry.createSurfaceTexture()
         surfaceTexture = surfaceEntry!!.surfaceTexture()
-        surfaceTexture!!.setDefaultBufferSize(width.toInt(), height.toInt())
 
         return surfaceEntry!!.id()
 
     }
 
     fun dispose():Unit{
-        if(surfaceEntry != null && textureRegistry != null){
+        if(surfaceEntry != null){
             surfaceEntry!!.release()
             surfaceEntry = null
-            textureRegistry = null
+            surfaceTexture!!.release()
+            surfaceTexture = null
 
         }
     }

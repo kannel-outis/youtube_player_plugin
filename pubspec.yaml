@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  lint: ^1.5.3
+  equatable: ^2.0.3
 
 dev_dependencies:
   flutter_test:
