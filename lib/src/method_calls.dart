@@ -20,15 +20,16 @@ class YoutubePlayerMethodCall {
     return textureId as int;
   }
 
-  static Future<void> initPlayer(
+  static Future<bool> initPlayer(
       {required String audioLink, required String videoLink}) async {
-    _channel.invokeMethod(
+    final readyToPlay = await _channel.invokeMethod(
       "initPlayer",
       {
         "audio": audioLink,
         "video": videoLink,
       },
-    );
+    ) as bool;
+    return readyToPlay;
   }
 
   static Future<void> dispose() async {
@@ -69,7 +70,20 @@ class YoutubePlayerMethodCall {
     return youtubeStatus;
   }
 
+  static Future<void> seekTo(Duration duration) async {
+    await _channel.invokeMethod(
+      "seekTo",
+      {
+        "duration": duration.inMilliseconds,
+      },
+    );
+  }
+
   static Future<int> position() async {
     return await _channel.invokeMethod("position") as int;
+  }
+
+  static Future<int> bufferedPosition() async {
+    return await _channel.invokeMethod("bufferedPosition") as int;
   }
 }

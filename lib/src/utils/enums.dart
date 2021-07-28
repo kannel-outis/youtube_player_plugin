@@ -3,6 +3,7 @@ enum YoutubePlayerStatus {
   paused,
   stopped,
   notInitialized,
+  initialized,
   ended,
   idle,
 }

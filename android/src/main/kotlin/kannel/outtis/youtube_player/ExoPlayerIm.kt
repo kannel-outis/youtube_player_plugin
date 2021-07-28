@@ -28,7 +28,7 @@ class ExoPlayerIm {
             return exoplayer!!
         }
 
-         fun setUpPlayer(call: MethodCall, context:android.content.Context, surfaceManager:SurfaceTextureManagerClass, eventChannel: EventChannel): Unit{
+         fun setUpPlayer(call: MethodCall, context:android.content.Context, surfaceManager:SurfaceTextureManagerClass, eventChannel: EventChannel): Boolean{
             val videoUrl:String? = call.argument<String>("video")
             val audioUrl:String? = call.argument<String>("audio")
             exoplayer =  SimpleExoPlayer.Builder(context).build()
@@ -61,6 +61,7 @@ class ExoPlayerIm {
              exoplayer!!.addListener(
                 ListenerF()
              )
+             return readyToPlay;
         }
 
         fun dispose():Unit{
@@ -97,9 +98,19 @@ class ExoPlayerIm {
                         result.success(status)
                     }
                 }
+                "seekTo"->{
+                    if(exoplayer != null){
+                        val  duration:Long = call.argument<Long>("duration")!!
+                        exoplayer!!.seekTo(duration)
+                    }
+                }
                 "position"->{
                     result.success(exoplayer!!.contentPosition)
                 }
+                "bufferedPosition"->{
+                    result.success(exoplayer!!.bufferedPosition)
+                }
+
             }
         }
 
@@ -130,7 +141,7 @@ class ExoPlayerIm {
                     }
                     Player.STATE_BUFFERING -> {
                         event["statusEvent"] = mapOf("playerStatus" to "state_buffering")
-                        event["percentageBuffered"]= exoplayer!!.bufferedPercentage
+                        event["percentageBuffered"] = exoplayer!!.bufferedPercentage
                         Log.d("bufferingData", exoplayer!!.bufferedPercentage.toString())
                     }
 

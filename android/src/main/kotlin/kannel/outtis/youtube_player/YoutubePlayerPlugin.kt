@@ -63,7 +63,8 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
           }
           "initPlayer" -> {
               eventChannel = EventChannel(messenger, "youtube-player + $textureId")
-              ExoPlayerIm.setUpPlayer(call = call, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
+             val r =  ExoPlayerIm.setUpPlayer(call = call, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
+              result.success(r);
 
           }
 
