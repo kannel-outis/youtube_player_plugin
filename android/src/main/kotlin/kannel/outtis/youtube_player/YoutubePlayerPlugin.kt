@@ -67,6 +67,10 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
               result.success(r);
 
           }
+          "doSomethingSilly"-> {
+              val link = call.argument<String>("link")
+              YtExtractorClassSingleTonObject.instance.extractFun(link!!, context!!, "144p")
+          }
 
 //          else -> {
 //              result.notImplemented()

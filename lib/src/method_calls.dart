@@ -86,4 +86,11 @@ class YoutubePlayerMethodCall {
   static Future<int> bufferedPosition() async {
     return await _channel.invokeMethod("bufferedPosition") as int;
   }
+
+  ///////////////////
+  static Future<void> doSomethingSilly(String link) async {
+    await _channel.invokeMethod("doSomethingSilly", {
+      "link": link,
+    });
+  }
 }

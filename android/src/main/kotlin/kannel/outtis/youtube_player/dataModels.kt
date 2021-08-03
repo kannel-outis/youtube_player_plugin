@@ -8,3 +8,9 @@ data class EventError(
     val details:Any?
 )
 
+data class StreamLinks(
+    val audioLink:String?,
+    val videoLink:String?
+
+)
+
