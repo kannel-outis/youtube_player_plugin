@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-
+import 'dart:developer';
 import 'utils/enums.dart';
 
 // ignore: avoid_classes_with_only_static_members
@@ -89,8 +89,9 @@ class YoutubePlayerMethodCall {
 
   ///////////////////
   static Future<void> doSomethingSilly(String link) async {
-    await _channel.invokeMethod("doSomethingSilly", {
+    var something = await _channel.invokeMethod("doSomethingSilly", {
       "link": link,
     });
+    log(something.toString());
   }
 }

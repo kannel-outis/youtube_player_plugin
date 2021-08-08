@@ -1,11 +1,12 @@
 package kannel.outtis.youtube_player
 
+
 import android.content.ContentValues.TAG
 import android.util.Log
 import android.util.SparseArray
-import at.huber.youtubeExtractor.YtFile
 import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
+import at.huber.youtubeExtractor.YtFile
 
 
 object YtExtractorClassSingleTonObject{
@@ -16,37 +17,54 @@ class YtExtractorClass{
     private var oldLink:String? = null
     private var resultLinks:SparseArray<YtFile>? = null
     private var links:StreamLinks? = null
-    fun extractFun(youtubeLink:String, context:android.content.Context, quality:String): StreamLinks{
-        var links:StreamLinks? = null
-        if(oldLink != youtubeLink){
+    fun extractFun(
+        youtubeLink: String,
+        context: android.content.Context,
+        quality: String,
+        callBackFun: (StreamLinks) -> Unit
+    ): Unit {
+        var links: StreamLinks? = null
+        if (oldLink != youtubeLink) {
             Log.i(TAG, "Not Same link")
             oldLink = youtubeLink
-            val ex = Ex(context, quality = quality){
+            val ex = Ex(context, quality = quality) {
                 resultLinks = it
                 links = getLinksFromExtractor(resultLinks!!, quality)
+                callBackFun(links!!)
             }
                 .extract(youtubeLink)
-//            return links!!
-                return links!!
-        }else{
+
+
+            Ex(context, quality = quality) {
+                resultLinks = it
+                links = getLinksFromExtractor(resultLinks!!, quality)
+                callBackFun(links!!)
+            }
+                .extract(youtubeLink)
+
+
+        } else {
             Log.i(TAG, "Same link")
 
-            if(resultLinks != null){
+            if (resultLinks != null) {
                 links = getLinksFromExtractor(resultLinks!!, quality)
-            }else{
-                val ex = Ex(context, quality = quality){
+                callBackFun(links!!)
+
+            } else {
+                Ex(context, quality = quality) {
                     resultLinks = it
                     links = getLinksFromExtractor(resultLinks!!, quality)
+                    callBackFun(links!!)
                 }
                     .extract(youtubeLink)
             }
-                return links!!
+
+
         }
 
 
-
-
     }
+
 
 
    private fun getLinksFromExtractor(ytFiles:SparseArray<YtFile>, quality:String):StreamLinks{
@@ -212,26 +230,24 @@ class YtExtractorClass{
 
 
 
-}
 
 
 
-    private class Ex (context:android.content.Context,val quality:String, val funct: (SparseArray<YtFile>)-> Unit): YouTubeExtractor(context){
 
+    private class Ex (context:android.content.Context,val quality:String, val callBackFun: (SparseArray<YtFile>)->Unit): YouTubeExtractor(context) {
 
-
-        var extractionComplete:Boolean = false;
-        var streamLinks:StreamLinks? = null
-        var ytFiless:SparseArray<YtFile>? = null
+        var extractionComplete: Boolean = false;
+        var streamLinks: StreamLinks? = null
+        var ytFiless: SparseArray<YtFile>? = null
         override fun onExtractionComplete(ytFiles: SparseArray<YtFile>?, videoMeta: VideoMeta?) {
             if (ytFiles != null) {
                 ytFiless = ytFiles
 //                Log.d(TAG, ytFiles.size().toString() + ":::::::::::::::::::::::::::::::::::::");
-                funct(ytFiles)
+                callBackFun(ytFiles)
 
             }
         }
-
-
+//
+    }
 }
 

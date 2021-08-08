@@ -13,6 +13,9 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 
 
 class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
@@ -69,7 +72,13 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
           }
           "doSomethingSilly"-> {
               val link = call.argument<String>("link")
-              YtExtractorClassSingleTonObject.instance.extractFun(link!!, context!!, "144p")
+               YtExtractorClassSingleTonObject.instance.extractFun(link!!, context!!, "144p"){
+                   val links:MutableMap<String, String?> = HashMap<String, String?>()
+                   links["audio"] = it.audioLink
+                   links["video"] = it.videoLink
+                   result.success(links!!)
+               }
+
           }
 
 //          else -> {
