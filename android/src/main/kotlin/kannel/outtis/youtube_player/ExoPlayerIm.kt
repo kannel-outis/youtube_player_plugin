@@ -28,9 +28,8 @@ class ExoPlayerIm {
             return exoplayer!!
         }
 
-         fun setUpPlayer(call: MethodCall, context:android.content.Context, surfaceManager:SurfaceTextureManagerClass, eventChannel: EventChannel): Boolean{
-            val videoUrl:String? = call.argument<String>("video")
-            val audioUrl:String? = call.argument<String>("audio")
+         fun setUpPlayer(videoUrl:String, audioUrl:String, context:android.content.Context, surfaceManager:SurfaceTextureManagerClass, eventChannel: EventChannel): Boolean{
+
             exoplayer =  SimpleExoPlayer.Builder(context).build()
             val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
             val vUri = Uri.parse(videoUrl)
@@ -42,6 +41,9 @@ class ExoPlayerIm {
             val mediaSource: MediaSource = MergingMediaSource(vSource, aSource)
             exoplayer!!.prepare(mediaSource)
              readyToPlay = true
+             exoplayer!!.addListener(
+                 ListenerF()
+             )
              eventChannel.setStreamHandler(
                object :  EventChannel.StreamHandler{
                    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
@@ -58,9 +60,7 @@ class ExoPlayerIm {
             val surface: Surface = Surface(surfaceManager.getSurfaceTexture())
             exoplayer!!.setVideoSurface(surface)
 //            exoplayer!!.playWhenReady = readyToPlay
-             exoplayer!!.addListener(
-                ListenerF()
-             )
+
              return readyToPlay;
         }
 
@@ -127,7 +127,7 @@ class ExoPlayerIm {
                 val event: MutableMap<String, Any> = HashMap()
                 when(state){
                     Player.STATE_READY -> {
-                            readyToPlay = true
+//                            readyToPlay = true
                         event["statusEvent"] = mapOf("playerStatus" to "state_ready")
                         event["playerReady"] = readyToPlay
                         event["duration"] = exoplayer!!.duration
@@ -141,6 +141,7 @@ class ExoPlayerIm {
                     }
                     Player.STATE_BUFFERING -> {
                         event["statusEvent"] = mapOf("playerStatus" to "state_buffering")
+                        event["playerReady"] = false
                         event["percentageBuffered"] = exoplayer!!.bufferedPercentage
                         Log.d("bufferingData", exoplayer!!.bufferedPercentage.toString())
                     }

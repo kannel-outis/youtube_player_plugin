@@ -72,10 +72,14 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
       : _audioLink = audioLink,
         _videoLink = videoLink,
         super(const _YoutubeControllerValue());
+  YoutubePlayerController.link({required String youtubeLink})
+      : _youtubeLink = youtubeLink,
+        super(const _YoutubeControllerValue());
 
   bool _isDisposed = false;
   int? _textureId;
   int? get textureId => _textureId;
+  String? _youtubeLink;
   late final String _audioLink;
   late final String _videoLink;
 
@@ -94,11 +98,19 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
     _appLifeCycleObserver = YoutubePlayerAppLifeCycleObserver(this)
       ..initialize();
     _textureId = await YoutubePlayerMethodCall.initSurface();
-    await YoutubePlayerMethodCall.initPlayer(
-            audioLink: _audioLink, videoLink: _videoLink)
-        .then((_) {
-      if (_ == true) {}
-    });
+    if (_youtubeLink != null) {
+      await YoutubePlayerMethodCall.initPlayer(youtubeLink: _youtubeLink)
+          .then((_) {
+        if (_ == true) {}
+      });
+    } else {
+      await YoutubePlayerMethodCall.initPlayer(
+              audioLink: _audioLink, videoLink: _videoLink)
+          .then((_) {
+        if (_ == true) {}
+      });
+    }
+
     _eventSubscription =
         YoutubePlayerMethodCall.eventsFromPlatform(_textureId!).listen((event) {
       _readyToPlayInit = Completer();
@@ -132,7 +144,14 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
                 buffering: false);
             break;
           case "state_buffering":
-            value = value.copywidth(buffering: true);
+            value = value.copywidth(
+                buffering: true,
+                youtubePlayerStatus: YoutubePlayerStatus.bufferring);
+            break;
+          case "state_ready":
+            value = value.copywidth(
+                youtubePlayerStatus: YoutubePlayerStatus.initialized,
+                buffering: false);
             break;
         }
       }

@@ -11,7 +11,7 @@ class TestingPage extends StatelessWidget {
       body: Container(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => YoutubePlayerMethodCall.doSomethingSilly(
-            "https://www.youtube.com/watch?v=X3Ai6osw3Mk"),
+            "https://www.youtube.com/watch?v=X3Ai6osw3Mk", "240p"),
       ),
     );
   }

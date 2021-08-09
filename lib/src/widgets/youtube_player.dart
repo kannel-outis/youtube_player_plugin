@@ -14,7 +14,7 @@ class YoutubePlayer extends StatefulWidget {
     required Widget toolBarControl,
     required Widget controls,
     required Widget progress,
-  })   : _toolBarControl = toolBarControl,
+  })  : _toolBarControl = toolBarControl,
         _controls = controls,
         _progress = progress,
         super(key: key);
@@ -285,11 +285,19 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                         child: SizedBox(
                           height: 60,
                           width: 60,
-                          child: AnimatedIcon(
-                            progress: _anime,
-                            icon: AnimatedIcons.play_pause,
-                            size: 50,
-                          ),
+                          child: widget.controller.value.buffering == true ||
+                                  widget.controller.value.youtubePlayerStatus ==
+                                      YoutubePlayerStatus.notInitialized
+                              ? const CircularProgressIndicator(
+                                  strokeWidth: 1,
+                                  valueColor:
+                                      AlwaysStoppedAnimation(Colors.white),
+                                )
+                              : AnimatedIcon(
+                                  progress: _anime,
+                                  icon: AnimatedIcons.play_pause,
+                                  size: 50,
+                                ),
                         ),
                       ),
                     ),

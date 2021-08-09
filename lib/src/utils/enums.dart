@@ -6,6 +6,8 @@ enum YoutubePlayerStatus {
   initialized,
   ended,
   idle,
+  //
+  bufferring,
 }
 
 enum ChangeYoutubePlayeStatus {

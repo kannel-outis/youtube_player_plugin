@@ -21,15 +21,16 @@ class YoutubePlayerMethodCall {
   }
 
   static Future<bool> initPlayer(
-      {required String audioLink, required String videoLink}) async {
+      {String? audioLink, String? videoLink, String? youtubeLink}) async {
     final readyToPlay = await _channel.invokeMethod(
       "initPlayer",
       {
         "audio": audioLink,
         "video": videoLink,
+        "youtubeLink": youtubeLink,
       },
-    ) as bool;
-    return readyToPlay;
+    );
+    return readyToPlay["readyToPlay"] as bool;
   }
 
   static Future<void> dispose() async {
@@ -88,9 +89,10 @@ class YoutubePlayerMethodCall {
   }
 
   ///////////////////
-  static Future<void> doSomethingSilly(String link) async {
+  static Future<void> doSomethingSilly(String link, String quality) async {
     var something = await _channel.invokeMethod("doSomethingSilly", {
       "link": link,
+      "quality": quality,
     });
     log(something.toString());
   }

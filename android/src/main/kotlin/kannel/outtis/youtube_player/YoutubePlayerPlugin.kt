@@ -1,26 +1,22 @@
 package kannel.outtis.youtube_player
 
+
+
 import android.net.Uri
 import android.view.Surface
 import android.util.Log
-
 import androidx.annotation.NonNull
-
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
 
 
 class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
   private lateinit var channel : MethodChannel
-  private lateinit var surfaceManager:SurfaceTextureManagerClass
+  private lateinit var surfaceManager: SurfaceTextureManagerClass
   var context:android.content.Context? = null
   var textureId:Long? = null
     private lateinit var eventChannel: EventChannel
@@ -65,19 +61,36 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
               Log.d("dispose", "dispose called and all cleared")
           }
           "initPlayer" -> {
-              eventChannel = EventChannel(messenger, "youtube-player + $textureId")
-             val r =  ExoPlayerIm.setUpPlayer(call = call, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
-              result.success(r);
+              var count:Int = 0
+              val videoUrl:String? = call.argument<String>("video")
+              val audioUrl:String? = call.argument<String>("audio")
+              val youtubeLink:String? = call.argument<String>("youtubeLink")
+//              val quality:String? = call.argument<String>("quality")
+              if(youtubeLink != null){
+                  YtExtractorClassSingleTonObject.instance.extractFun(youtubeLink!!, context!!, "144p"){
+                      count++
+                      if(count == 1){
+                          val links:MutableMap<String, Any?> = HashMap<String, Any?>()
+                          links["audio"] = it.audioLink
+                          links["video"] = it.videoLink
+                          eventChannel = EventChannel(messenger, "youtube-player + $textureId")
+                          val readyToPlay =  ExoPlayerIm.setUpPlayer(audioUrl = it.audioLink!!, videoUrl = it.videoLink!!, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
+                          links["readyToPlay"] = readyToPlay
+                          result.success(links)
+                      }
+
+                  }
+              }else{
+                  eventChannel = EventChannel(messenger, "youtube-player + $textureId")
+                  val readyToPlay =  ExoPlayerIm.setUpPlayer(audioUrl = audioUrl!!, videoUrl = videoUrl!!, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
+                  result.success(readyToPlay);
+              }
+
 
           }
           "doSomethingSilly"-> {
               val link = call.argument<String>("link")
-               YtExtractorClassSingleTonObject.instance.extractFun(link!!, context!!, "144p"){
-                   val links:MutableMap<String, String?> = HashMap<String, String?>()
-                   links["audio"] = it.audioLink
-                   links["video"] = it.videoLink
-                   result.success(links!!)
-               }
+
 
           }
 
