@@ -5,11 +5,14 @@ import '../custom_slider.dart';
 
 class ProgressSecWidget extends StatefulWidget {
   final YoutubePlayerController controller;
-  final bool? show;
+  final bool show;
   final AnimationController? animeController;
 
   const ProgressSecWidget(
-      {Key? key, required this.controller, this.show, this.animeController})
+      {Key? key,
+      required this.controller,
+      this.show = false,
+      this.animeController})
       : super(key: key);
 
   @override
@@ -20,7 +23,7 @@ class _ProgressSecWidgetState extends State<ProgressSecWidget> {
   @override
   void initState() {
     super.initState();
-    if (widget.show != null && widget.show! == true) {
+    if (widget.show != null && widget.show == true) {
       widget.animeController!.forward();
     } else if (widget.show == false) {
       widget.animeController!.reverse();
@@ -30,8 +33,8 @@ class _ProgressSecWidgetState extends State<ProgressSecWidget> {
   @override
   void didUpdateWidget(covariant ProgressSecWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.show! != widget.show) {
-      if (widget.show != null && widget.show! == true) {
+    if (oldWidget.show != widget.show) {
+      if (widget.show == true) {
         widget.animeController!.forward();
       } else if (widget.show == false) {
         widget.animeController!.reverse();
@@ -65,29 +68,31 @@ class _ProgressSecWidgetState extends State<ProgressSecWidget> {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(children: [
-                  Text(
-                    "${_timerStringRep(widget.controller.value.position.toString())} /",
-                    style: const TextStyle(fontSize: 15),
-                  ),
-                  Text(
-                    " ${_timerStringRep(widget.controller.value.duration.toString())}",
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white.withOpacity(.5),
-                    ),
+            child: widget.show
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(children: [
+                        Text(
+                          "${_timerStringRep(widget.controller.value.position.toString())} /",
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                        Text(
+                          " ${_timerStringRep(widget.controller.value.duration.toString())}",
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.white.withOpacity(.5),
+                          ),
+                        )
+                      ]),
+                      Icon(
+                        Icons.fullscreen,
+                        size: 23,
+                        color: Colors.white.withOpacity(.8),
+                      )
+                    ],
                   )
-                ]),
-                Icon(
-                  Icons.fullscreen,
-                  size: 23,
-                  color: Colors.white.withOpacity(.8),
-                )
-              ],
-            ),
+                : const SizedBox(),
           ),
           const SizedBox(height: 20),
           SizedBox(

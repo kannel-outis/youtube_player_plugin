@@ -173,7 +173,6 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
       _bTimer?.cancel();
       return;
     }
-    print("shit happens");
     final _bPosition = await bufferedPosition;
     if (_bPosition == value.duration) _bTimer?.cancel();
     value = value.copywidth(bufferedPosition: _bPosition);

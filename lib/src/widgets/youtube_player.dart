@@ -84,20 +84,20 @@ class _YoutubePlayerState extends State<YoutubePlayer>
           ),
         ),
         GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onDoubleTap: () {
-            show = false;
-            setState(() {});
-          },
-          onTap: () {
-            setState(() {
-              if (show) {
-                show = false;
-              } else {
-                show = true;
-              }
-            });
-          },
+          // behavior: HitTestBehavior.opaque,
+          // onDoubleTap: () {
+          //   show = false;
+          //   setState(() {});
+          // },
+          // onTap: () {
+          //   setState(() {
+          //     if (show) {
+          //       show = false;
+          //     } else {
+          //       show = true;
+          //     }
+          //   });
+          // },
           child: AspectRatio(
             aspectRatio: widget.controller.value.aspectRatio,
             child: SizedBox(
