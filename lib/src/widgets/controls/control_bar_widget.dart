@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player/src/utils/utils.dart';
+import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/youtube_player.dart';
 
 class ControlBarwidget extends StatefulWidget {
   final YoutubePlayerController controller;
   final bool show;
+  final YoutubePlayerColors? colors;
 
   const ControlBarwidget(
-      {Key? key, required this.controller, this.show = false})
+      {Key? key, required this.controller, this.show = false, this.colors})
       : super(key: key);
 
   @override
@@ -52,15 +55,20 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
   @override
   Widget build(BuildContext context) {
     return _show != null && _show!
-        ? SizedBox(
-            width: 320,
+        ? Container(
+            // color: Colors.pink,
+            width: Utils.blockWidth * 50,
+            constraints: BoxConstraints(
+              maxWidth: Utils.blockWidth * 60 > 350 ? 300 : 200,
+              // minWidth: 250,
+            ),
             child: Center(
               child: InkWell(
                 onTap: () {
                   return;
                 },
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(
                       onTap: () {
@@ -73,22 +81,24 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                           ),
                         );
                       },
-                      child: const Center(
+                      child: Center(
                         child: SizedBox(
-                          height: 60,
-                          width: 60,
-                          child: Icon(Icons.replay_10_outlined, size: 40),
+                          child: Icon(
+                            Icons.replay_10_outlined,
+                            size: Utils.blockWidth * 8 > 50
+                                ? 50
+                                : Utils.blockWidth * 8,
+                            color: widget.colors!.iconsColor,
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 70),
                     InkWell(
                       onTap: () {
                         if (widget.controller.value.youtubePlayerStatus ==
                                 YoutubePlayerStatus.initialized ||
                             widget.controller.value.youtubePlayerStatus ==
                                 YoutubePlayerStatus.paused) {
-                          print(shouldPlay);
                           _anime.forward();
                           widget.controller.play();
                         } else if (widget
@@ -100,25 +110,29 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                       },
                       child: Center(
                         child: SizedBox(
-                          height: 60,
-                          width: 60,
                           child: widget.controller.value.buffering == true ||
                                   widget.controller.value.youtubePlayerStatus ==
                                       YoutubePlayerStatus.notInitialized
-                              ? const CircularProgressIndicator(
-                                  strokeWidth: 1,
-                                  valueColor:
-                                      AlwaysStoppedAnimation(Colors.white),
+                              ? SizedBox(
+                                  height: Utils.blockWidth * 10,
+                                  width: Utils.blockWidth * 10,
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor:
+                                        AlwaysStoppedAnimation(Colors.white),
+                                  ),
                                 )
                               : AnimatedIcon(
                                   progress: _anime,
                                   icon: AnimatedIcons.play_pause,
-                                  size: 50,
+                                  color: widget.colors!.iconsColor,
+                                  size: Utils.blockWidth * 10 > 55
+                                      ? 55
+                                      : Utils.blockWidth * 10,
                                 ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 70),
                     InkWell(
                       onTap: () {
                         widget.controller.seekTo(
@@ -130,11 +144,15 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                           ),
                         );
                       },
-                      child: const Center(
+                      child: Center(
                         child: SizedBox(
-                          height: 60,
-                          width: 60,
-                          child: Icon(Icons.forward_10_outlined, size: 40),
+                          child: Icon(
+                            Icons.forward_10_outlined,
+                            size: Utils.blockWidth * 8 > 50
+                                ? 50
+                                : Utils.blockWidth * 8,
+                            color: widget.colors!.iconsColor,
+                          ),
                         ),
                       ),
                     ),

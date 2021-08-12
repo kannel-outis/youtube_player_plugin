@@ -206,7 +206,7 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
     _status = await YoutubePlayerMethodCall.getPlayerStaus(
         ChangeYoutubePlayeStatus.pause);
     value = value.copywidth(youtubePlayerStatus: _status);
-    _timer!.cancel();
+    if (_timer != null) _timer!.cancel();
   }
 
   Future<void> stop() async {
@@ -229,6 +229,13 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
   }
 
   Future<void> seekTo(Duration duration) async {
+    if (duration < const Duration()) {
+      value = value.copywidth(position: const Duration());
+      await YoutubePlayerMethodCall.seekTo(const Duration());
+    } else if (duration > value.duration) {
+      value = value.copywidth(position: value.duration);
+      await YoutubePlayerMethodCall.seekTo(value.duration);
+    }
     value = value.copywidth(position: duration);
     await YoutubePlayerMethodCall.seekTo(duration);
   }

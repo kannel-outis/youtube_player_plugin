@@ -207,7 +207,7 @@ class RenderCustomSliderForPlayer extends RenderBox {
 //Progress
     final p = Paint()
       ..color = _progressBarcolor
-      ..strokeWidth = 2.5;
+      ..strokeWidth = 3.0;
     final p1 = Offset(0, size.height / 2);
     final p2 = Offset(_show.clamp(0.0, 1.0) * size.width, size.height / 2);
     canvas.drawLine(p1, p2, p);
@@ -216,6 +216,9 @@ class RenderCustomSliderForPlayer extends RenderBox {
     final thumbPaint = Paint()..color = _thumbColor;
     final thumbDx = _thumbValue.clamp(0.0, 1.0) * size.width;
     final center = Offset(thumbDx, size.height / 2);
+    // final center = Offset(
+    //     _show >= 0 ? thumbDx - _thumbSize / 2 : thumbDx + _thumbSize / 2,
+    //     size.height / 2);
     canvas.drawCircle(center, _thumbSize / 2, thumbPaint);
     canvas.restore();
   }

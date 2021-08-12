@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/youtube_player.dart';
 import 'controls/control_bar_widget.dart';
 import 'controls/progress_bar_widget.dart';
 import 'controls/tool_bar_widget.dart';
-import 'custom_slider.dart';
 
 const _duration = Duration(milliseconds: 300);
 
 // ignore_for_file: must_be_immutable, avoid_init_to_null
 class YoutubePlayer extends StatefulWidget {
   final YoutubePlayerController controller;
-  YoutubePlayer({Key? key, required this.controller}) : super(key: key);
+
+  YoutubePlayer({
+    Key? key,
+    required this.controller,
+    YoutubePlayerColors colors = const YoutubePlayerColors.auto(),
+  })  : _colors = colors,
+        super(key: key);
   YoutubePlayer.withControls({
     Key? key,
     required this.controller,
@@ -27,6 +33,8 @@ class YoutubePlayer extends StatefulWidget {
   Widget? get controls => _controls;
   late Widget? _progress = null;
   Widget? get progress => _progress;
+  late YoutubePlayerColors _colors;
+  YoutubePlayerColors get colors => _colors;
 
   @override
   _YoutubePlayerState createState() => _YoutubePlayerState();
@@ -55,9 +63,9 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   }
 
   @override
-  void deactivate() {
+  void dispose() {
     widget.controller.dispose();
-    super.deactivate();
+    super.dispose();
   }
 
   @override
@@ -99,7 +107,8 @@ class _YoutubePlayerState extends State<YoutubePlayer>
           //   });
           // },
           child: AspectRatio(
-            aspectRatio: widget.controller.value.aspectRatio,
+            // aspectRatio: widget.controller.value.aspectRatio,
+            aspectRatio: 16 / 9.16,
             child: SizedBox(
               width: double.infinity,
               child: Column(
@@ -107,9 +116,13 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                 children: [
                   // tool bar
                   widget._toolBarControl ??
-                      ToolBarWidget(
-                        controller: widget.controller,
-                        show: show,
+                      Container(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: ToolBarWidget(
+                          controller: widget.controller,
+                          show: show,
+                          colors: widget.colors,
+                        ),
                       ),
 
                   // control sec
@@ -117,6 +130,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                       ControlBarwidget(
                         controller: widget.controller,
                         show: show,
+                        colors: widget.colors,
                       ),
 
                   // bottom buffer, progress, thumb and shit
@@ -125,6 +139,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                         show: show,
                         animeController: _animeController,
                         controller: widget.controller,
+                        colors: widget.colors,
                       ),
                 ],
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player/src/controller.dart';
+import 'package:youtube_player/src/utils/utils.dart';
 
 class Player extends StatefulWidget {
   final YoutubePlayerController controller;
@@ -29,9 +30,17 @@ class _PlayerState extends State<Player> {
   @override
   void initState() {
     super.initState();
-    _textureId = widget.controller.textureId;
-    setS();
-    widget.controller.addListener(_listener);
+    if (mounted) {
+      _textureId = widget.controller.textureId;
+      setS();
+      widget.controller.addListener(_listener);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (mounted) Utils.calculateBlockHeightAndWidth(context);
   }
 
   @override

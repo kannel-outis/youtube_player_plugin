@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player/src/utils/utils.dart';
+import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/youtube_player.dart';
 
 class ToolBarWidget extends StatefulWidget {
   final bool show;
   final YoutubePlayerController? controller;
-  const ToolBarWidget({Key? key, this.controller, this.show = false})
+  final YoutubePlayerColors? colors;
+
+  const ToolBarWidget(
+      {Key? key, this.controller, this.show = false, this.colors})
       : super(key: key);
 
   @override
@@ -40,16 +45,30 @@ class _ToolBarWidgetState extends State<ToolBarWidget> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(Icons.expand_more_outlined),
+                Icon(
+                  Icons.expand_more_outlined,
+                  size:
+                      Utils.blockWidth * 4.5 > 35 ? 35 : Utils.blockWidth * 4.5,
+                  color: widget.colors!.iconsColor,
+                ),
                 SizedBox(
-                  width: 70,
+                  width: Utils.blockWidth * 15,
                   child: Row(
-                    children: const [
-                      Icon(Icons.more_vert),
-                      Expanded(child: SizedBox()),
+                    children: [
+                      Icon(
+                        Icons.more_vert,
+                        size: Utils.blockWidth * 4.5 > 35
+                            ? 35
+                            : Utils.blockWidth * 4.5,
+                        color: widget.colors!.iconsColor,
+                      ),
+                      const Expanded(child: SizedBox()),
                       Icon(
                         Icons.close,
-                        size: 20,
+                        size: Utils.blockWidth * 4.5 > 35
+                            ? 35
+                            : Utils.blockWidth * 4.5,
+                        color: widget.colors!.iconsColor,
                       ),
                     ],
                   ),

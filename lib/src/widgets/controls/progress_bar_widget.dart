@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player/src/utils/utils.dart';
+import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/youtube_player.dart';
 
 import '../custom_slider.dart';
@@ -7,12 +9,14 @@ class ProgressSecWidget extends StatefulWidget {
   final YoutubePlayerController controller;
   final bool show;
   final AnimationController? animeController;
+  final YoutubePlayerColors? colors;
 
   const ProgressSecWidget(
       {Key? key,
       required this.controller,
       this.show = false,
-      this.animeController})
+      this.animeController,
+      this.colors})
       : super(key: key);
 
   @override
@@ -23,7 +27,7 @@ class _ProgressSecWidgetState extends State<ProgressSecWidget> {
   @override
   void initState() {
     super.initState();
-    if (widget.show != null && widget.show == true) {
+    if (widget.show == true) {
       widget.animeController!.forward();
     } else if (widget.show == false) {
       widget.animeController!.reverse();
@@ -75,26 +79,35 @@ class _ProgressSecWidgetState extends State<ProgressSecWidget> {
                       Row(children: [
                         Text(
                           "${_timerStringRep(widget.controller.value.position.toString())} /",
-                          style: const TextStyle(fontSize: 15),
+                          style: TextStyle(
+                            fontSize: Utils.blockWidth * 2.5 > 25
+                                ? 25
+                                : Utils.blockWidth * 2.5,
+                            color: Colors.white.withOpacity(.8),
+                          ),
                         ),
                         Text(
                           " ${_timerStringRep(widget.controller.value.duration.toString())}",
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: Utils.blockWidth * 2.5 > 25
+                                ? 25
+                                : Utils.blockWidth * 2.5,
                             color: Colors.white.withOpacity(.5),
                           ),
                         )
                       ]),
                       Icon(
                         Icons.fullscreen,
-                        size: 23,
-                        color: Colors.white.withOpacity(.8),
+                        size: Utils.blockWidth * 3.5 > 30
+                            ? 30
+                            : Utils.blockWidth * 3.5,
+                        color: widget.colors!.iconsColor!.withOpacity(.8),
                       )
                     ],
                   )
                 : const SizedBox(),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: Utils.blockHeight * 1.3),
           SizedBox(
             height: 15,
             child: CustomSliderForPlayer(
@@ -109,10 +122,10 @@ class _ProgressSecWidgetState extends State<ProgressSecWidget> {
                   ? widget.controller.value.bufferedPosition.inMilliseconds /
                       widget.controller.value.duration.inMilliseconds
                   : 0.0,
-              progressBarColor: Colors.red,
-              barColor: Colors.white.withOpacity(.25),
-              bufferedColor: Colors.white.withOpacity(.5),
-              thumbColor: Colors.red,
+              progressBarColor: widget.colors!.progressColor!,
+              barColor: widget.colors!.barColor!.withOpacity(.25),
+              bufferedColor: widget.colors!.bufferedColor!.withOpacity(.5),
+              thumbColor: widget.colors!.thumbColor!,
               seekTo: (value) {
                 widget.controller.seekTo(
                   Duration(
