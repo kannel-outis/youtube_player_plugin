@@ -21,13 +21,17 @@ class YoutubePlayerMethodCall {
   }
 
   static Future<bool> initPlayer(
-      {String? audioLink, String? videoLink, String? youtubeLink}) async {
+      {String? audioLink,
+      String? videoLink,
+      String? youtubeLink,
+      String? quality}) async {
     final readyToPlay = await _channel.invokeMethod(
       "initPlayer",
       {
         "audio": audioLink,
         "video": videoLink,
         "youtubeLink": youtubeLink,
+        "quality": quality,
       },
     );
     return readyToPlay["readyToPlay"] as bool;

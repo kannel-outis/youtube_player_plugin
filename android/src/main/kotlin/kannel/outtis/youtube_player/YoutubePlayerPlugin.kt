@@ -65,9 +65,9 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
               val videoUrl:String? = call.argument<String>("video")
               val audioUrl:String? = call.argument<String>("audio")
               val youtubeLink:String? = call.argument<String>("youtubeLink")
-//              val quality:String? = call.argument<String>("quality")
+              val quality:String? = call.argument<String>("quality")
               if(youtubeLink != null){
-                  YtExtractorClassSingleTonObject.instance.extractFun(youtubeLink!!, context!!, "144p"){
+                  YtExtractorClassSingleTonObject.instance.extractFun(youtubeLink, context!!, quality!!){
                       count++
                       if(count == 1){
                           val links:MutableMap<String, Any?> = HashMap<String, Any?>()
