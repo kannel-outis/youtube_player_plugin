@@ -184,7 +184,7 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
     if (!_readyToPlayInit!.isCompleted && _isDisposed) return;
     _status = await YoutubePlayerMethodCall.getPlayerStaus(
         ChangeYoutubePlayeStatus.play);
-    _timer = Timer.periodic(const Duration(milliseconds: 300), _ticker);
+    _timer = Timer.periodic(const Duration(milliseconds: 500), _ticker);
   }
 
   Future<void> _ticker(Timer timer) async {

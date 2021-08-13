@@ -108,7 +108,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
           // },
           child: AspectRatio(
             // aspectRatio: widget.controller.value.aspectRatio,
-            aspectRatio: 16 / 9.16,
+            aspectRatio: 16 / 9,
             child: SizedBox(
               width: double.infinity,
               child: Column(

@@ -175,7 +175,7 @@ class RenderCustomSliderForPlayer extends RenderBox {
 
     //Progressbar
     final barPaint = Paint()
-      ..color = Colors.transparent
+      ..color = _barcolor
       ..strokeWidth = 2.5;
     final point1 = Offset(0, size.height / 2);
     final point2 = Offset(size.width, size.height / 2);
@@ -216,9 +216,6 @@ class RenderCustomSliderForPlayer extends RenderBox {
     final thumbPaint = Paint()..color = _thumbColor;
     final thumbDx = _thumbValue.clamp(0.0, 1.0) * size.width;
     final center = Offset(thumbDx, size.height / 2);
-    // final center = Offset(
-    //     _show >= 0 ? thumbDx - _thumbSize / 2 : thumbDx + _thumbSize / 2,
-    //     size.height / 2);
     canvas.drawCircle(center, _thumbSize / 2, thumbPaint);
     canvas.restore();
   }

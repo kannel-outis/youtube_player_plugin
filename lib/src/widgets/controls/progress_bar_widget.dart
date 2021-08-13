@@ -112,7 +112,8 @@ class _ProgressSecWidgetState extends State<ProgressSecWidget> {
             height: 15,
             child: CustomSliderForPlayer(
               // 15.0
-              thumbSize: 15.0 * widget.animeController!.value,
+              thumbSize:
+                  (Utils.blockWidth * 2.5) * widget.animeController!.value,
               value: widget.controller.value.duration != const Duration()
                   ? widget.controller.value.position.inMilliseconds /
                       widget.controller.value.duration.inMilliseconds
@@ -123,8 +124,8 @@ class _ProgressSecWidgetState extends State<ProgressSecWidget> {
                       widget.controller.value.duration.inMilliseconds
                   : 0.0,
               progressBarColor: widget.colors!.progressColor!,
-              barColor: widget.colors!.barColor!.withOpacity(.25),
-              bufferedColor: widget.colors!.bufferedColor!.withOpacity(.5),
+              barColor: widget.colors!.barColor!.withOpacity(.1),
+              bufferedColor: widget.colors!.bufferedColor!.withOpacity(.3),
               thumbColor: widget.colors!.thumbColor!,
               seekTo: (value) {
                 widget.controller.seekTo(
