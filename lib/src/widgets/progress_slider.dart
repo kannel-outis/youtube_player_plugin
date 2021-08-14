@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 
 typedef SeekToCallBack = Function(double);
 
-class CustomSliderForPlayer extends LeafRenderObjectWidget {
+class ProgressSlider extends LeafRenderObjectWidget {
   final Color thumbColor, barColor, progressBarColor, bufferedColor;
   final double? thumbSize;
   final SeekToCallBack? seekTo;
   final double? bufferedValue;
   final double value;
 
-  const CustomSliderForPlayer({
+  const ProgressSlider({
     Key? key,
     required this.thumbColor,
     required this.barColor,
@@ -23,8 +23,8 @@ class CustomSliderForPlayer extends LeafRenderObjectWidget {
     this.value = 0.0,
   }) : super(key: key);
   @override
-  RenderCustomSliderForPlayer createRenderObject(BuildContext context) {
-    return RenderCustomSliderForPlayer(
+  RenderProgressSlider createRenderObject(BuildContext context) {
+    return RenderProgressSlider(
       barColor: barColor,
       thumbColor: thumbColor,
       thumbSize: thumbSize!,
@@ -37,8 +37,8 @@ class CustomSliderForPlayer extends LeafRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext context,
-      covariant RenderCustomSliderForPlayer renderObject) {
+  void updateRenderObject(
+      BuildContext context, covariant RenderProgressSlider renderObject) {
     renderObject
       ..barcolor = barColor
       ..thumbcolor = thumbColor
@@ -50,14 +50,14 @@ class CustomSliderForPlayer extends LeafRenderObjectWidget {
   }
 }
 
-class RenderCustomSliderForPlayer extends RenderBox {
+class RenderProgressSlider extends RenderBox {
   final Color thumbColor, barColor, progressBarColor, bufferedColor;
   final double thumbSize;
   final SeekToCallBack? seekTo;
   final double bufferedValue;
   final double value;
 
-  RenderCustomSliderForPlayer({
+  RenderProgressSlider({
     required this.thumbColor,
     required this.barColor,
     required this.thumbSize,

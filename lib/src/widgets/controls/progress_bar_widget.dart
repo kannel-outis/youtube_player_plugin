@@ -3,7 +3,7 @@ import 'package:youtube_player/src/utils/utils.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/youtube_player.dart';
 
-import '../custom_slider.dart';
+import '../progress_slider.dart';
 
 class ProgressSecWidget extends StatefulWidget {
   final YoutubePlayerController controller;
@@ -110,10 +110,11 @@ class _ProgressSecWidgetState extends State<ProgressSecWidget> {
           SizedBox(height: Utils.blockHeight * 1.3),
           SizedBox(
             height: 15,
-            child: CustomSliderForPlayer(
+            child: ProgressSlider(
               // 15.0
               thumbSize:
-                  (Utils.blockWidth * 2.5) * widget.animeController!.value,
+                  (Utils.blockHeight * 1.2) * widget.animeController!.value,
+              // thumbSize: 15.0 * widget.animeController!.value,
               value: widget.controller.value.duration != const Duration()
                   ? widget.controller.value.position.inMilliseconds /
                       widget.controller.value.duration.inMilliseconds
@@ -125,7 +126,7 @@ class _ProgressSecWidgetState extends State<ProgressSecWidget> {
                   : 0.0,
               progressBarColor: widget.colors!.progressColor!,
               barColor: widget.colors!.barColor!.withOpacity(.1),
-              bufferedColor: widget.colors!.bufferedColor!.withOpacity(.3),
+              bufferedColor: widget.colors!.bufferedColor!.withOpacity(.4),
               thumbColor: widget.colors!.thumbColor!,
               seekTo: (value) {
                 widget.controller.seekTo(

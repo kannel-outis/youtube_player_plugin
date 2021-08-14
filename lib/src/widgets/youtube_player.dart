@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player/src/utils/utils.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/youtube_player.dart';
 import 'controls/control_bar_widget.dart';
 import 'controls/progress_bar_widget.dart';
+import 'sized_aspect_ratio_widget.dart';
 import 'controls/tool_bar_widget.dart';
 
 const _duration = Duration(milliseconds: 300);
@@ -106,9 +108,9 @@ class _YoutubePlayerState extends State<YoutubePlayer>
           //     }
           //   });
           // },
-          child: AspectRatio(
-            // aspectRatio: widget.controller.value.aspectRatio,
-            aspectRatio: 16 / 9,
+          child: SizedAspectRatioWidget(
+            additionalSize: const Size(0, 6),
+            aspectRatio: widget.controller.value.aspectRatio,
             child: SizedBox(
               width: double.infinity,
               child: Column(
