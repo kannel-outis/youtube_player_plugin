@@ -30,7 +30,7 @@ class _YoutubeControllerValue extends Equatable {
     if (size != null) {
       return size!.width / size!.height;
     } else {
-      return 16 / 9;
+      return 16 / 7.4;
     }
   }
 
@@ -238,6 +238,18 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
     }
     value = value.copywidth(position: duration);
     await YoutubePlayerMethodCall.seekTo(duration);
+  }
+
+  Future<void> videoQualityChange(
+      {String? audioLink,
+      String? videoLink,
+      String? youtubeLink,
+      String? quality}) async {
+    await YoutubePlayerMethodCall.videoQualityChange(
+        audioLink: audioLink,
+        quality: quality,
+        videoLink: videoLink,
+        youtubeLink: youtubeLink);
   }
 
   @override

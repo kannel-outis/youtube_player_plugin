@@ -15,3 +15,11 @@ enum ChangeYoutubePlayeStatus {
   pause,
   stop,
 }
+
+enum YoutubePlayerVideoQuality {
+  quality_144p,
+  quality_240p,
+  quality_480p,
+  quality_720p,
+  quality_1080p,
+}

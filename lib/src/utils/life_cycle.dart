@@ -24,7 +24,9 @@ class YoutubePlayerAppLifeCycleObserver extends WidgetsBindingObserver {
         }
         _wasPlayingBeforePause = _controller.value.youtubePlayerStatus ==
             YoutubePlayerStatus.playing;
-        _controller.pause();
+        if (_wasPlayingBeforePause) {
+          _controller.pause();
+        }
         break;
       case AppLifecycleState.resumed:
         if (_wasPlayingBeforePause) {

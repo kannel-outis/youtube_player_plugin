@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player/src/utils/utils.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
+import 'package:youtube_player/src/widgets/inherited_state.dart';
 import 'package:youtube_player/youtube_player.dart';
 
 class ToolBarWidget extends StatefulWidget {
@@ -39,7 +40,7 @@ class _ToolBarWidgetState extends State<ToolBarWidget> {
   Widget build(BuildContext context) {
     return _show != null && _show!
         ? Container(
-            height: 35,
+            // height: 35,
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -47,8 +48,7 @@ class _ToolBarWidgetState extends State<ToolBarWidget> {
               children: [
                 Icon(
                   Icons.expand_more_outlined,
-                  size:
-                      Utils.blockWidth * 4.5 > 35 ? 35 : Utils.blockWidth * 4.5,
+                  size: Utils.blockWidth * 4 > 35 ? 35 : Utils.blockWidth * 4,
                   color: widget.colors!.iconsColor,
                 ),
                 SizedBox(
@@ -56,19 +56,25 @@ class _ToolBarWidgetState extends State<ToolBarWidget> {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.more_vert,
-                        size: Utils.blockWidth * 4.5 > 35
+                        Icons.more_vert_outlined,
+                        size: Utils.blockWidth * 4 > 35
                             ? 35
-                            : Utils.blockWidth * 4.5,
+                            : Utils.blockWidth * 4,
                         color: widget.colors!.iconsColor,
                       ),
                       const Expanded(child: SizedBox()),
-                      Icon(
-                        Icons.close,
-                        size: Utils.blockWidth * 4.5 > 35
-                            ? 35
-                            : Utils.blockWidth * 4.5,
-                        color: widget.colors!.iconsColor,
+                      IconButton(
+                        onPressed: () {
+                          InheritedState.of(context).stateChange?.call(false);
+                          setState(() {});
+                        },
+                        icon: Icon(
+                          Icons.close_outlined,
+                          size: Utils.blockWidth * 4 > 35
+                              ? 35
+                              : Utils.blockWidth * 4,
+                          color: widget.colors!.iconsColor,
+                        ),
                       ),
                     ],
                   ),

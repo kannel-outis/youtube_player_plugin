@@ -61,15 +61,15 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
               Log.d("dispose", "dispose called and all cleared")
           }
           "initPlayer" -> {
-              var count:Int = 0
+//              var count:Int = 0
               val videoUrl:String? = call.argument<String>("video")
               val audioUrl:String? = call.argument<String>("audio")
               val youtubeLink:String? = call.argument<String>("youtubeLink")
               val quality:String? = call.argument<String>("quality")
               if(youtubeLink != null){
                   YtExtractorClassSingleTonObject.instance.extractFun(youtubeLink, context!!, quality!!){
-                      count++
-                      if(count == 1){
+//                      count++
+//                      if(count == 1){
                           val links:MutableMap<String, Any?> = HashMap<String, Any?>()
                           links["audio"] = it.audioLink
                           links["video"] = it.videoLink
@@ -77,7 +77,7 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
                           val readyToPlay =  ExoPlayerIm.setUpPlayer(audioUrl = it.audioLink!!, videoUrl = it.videoLink!!, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
                           links["readyToPlay"] = readyToPlay
                           result.success(links)
-                      }
+//                      }
 
                   }
               }else{
@@ -88,8 +88,19 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
 
 
           }
-          "doSomethingSilly"-> {
-              val link = call.argument<String>("link")
+          "videoQualityChange"-> {
+              val quality:String? = call.argument<String>("quality")
+              val videoUrl:String? = call.argument<String>("video")
+              val audioUrl:String? = call.argument<String>("audio")
+              val youtubeLink:String? = call.argument<String>("youtubeLink")
+              if(youtubeLink != null){
+                  YtExtractorClassSingleTonObject.instance.extractFun(youtubeLink, context!!, quality!!){
+                      ExoPlayerIm.onVideoQualityChange(it)
+                  }
+              }else{
+                  val streamLinks = StreamLinks(audioUrl, videoUrl)
+                  ExoPlayerIm.onVideoQualityChange(streamLinks)
+              }
 
 
           }

@@ -39,7 +39,8 @@ class ExoPlayerIm {
             val aSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
                 MediaItem.fromUri(aUri))
             val mediaSource: MediaSource = MergingMediaSource(vSource, aSource)
-            exoplayer!!.prepare(mediaSource)
+            exoplayer!!.setMediaSource(mediaSource)
+             exoplayer!!.prepare()
              readyToPlay = true
              exoplayer!!.addListener(
                  ListenerF()
@@ -62,6 +63,22 @@ class ExoPlayerIm {
 //            exoplayer!!.playWhenReady = readyToPlay
 
              return readyToPlay;
+        }
+
+        fun onVideoQualityChange(streamLinks: StreamLinks):Unit{
+            if(exoplayer != null){
+                var position:Long = exoplayer!!.currentPosition
+                val vUri = Uri.parse(streamLinks.videoLink)
+                val aUri  = Uri.parse(streamLinks.audioLink)
+                val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
+                val vSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
+                        MediaItem.fromUri(vUri))
+                val aSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
+                        MediaItem.fromUri(aUri))
+                val mediaSource: MediaSource = MergingMediaSource(vSource, aSource)
+                exoplayer!!.setMediaSource(mediaSource)
+                exoplayer!!.seekTo(position)
+            }
         }
 
         fun dispose():Unit{

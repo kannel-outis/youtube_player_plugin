@@ -27,12 +27,12 @@ class YtExtractorClass{
         if (oldLink != youtubeLink) {
             Log.i(TAG, "Not Same link")
             oldLink = youtubeLink
-            val ex = Ex(context, quality = quality) {
-                resultLinks = it
-                links = getLinksFromExtractor(resultLinks!!, quality)
-                callBackFun(links!!)
-            }
-                .extract(youtubeLink)
+//            val ex = Ex(context, quality = quality) {
+//                resultLinks = it
+//                links = getLinksFromExtractor(resultLinks!!, quality)
+//                callBackFun(links!!)
+//            }
+//                .extract(youtubeLink)
 
 
             Ex(context, quality = quality) {

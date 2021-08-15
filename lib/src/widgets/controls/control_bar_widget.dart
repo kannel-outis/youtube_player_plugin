@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player/src/utils/utils.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
+import 'package:youtube_player/src/widgets/inherited_state.dart';
 import 'package:youtube_player/youtube_player.dart';
 
 class ControlBarwidget extends StatefulWidget {
   final YoutubePlayerController controller;
-  final bool show;
   final YoutubePlayerColors? colors;
 
-  const ControlBarwidget(
-      {Key? key, required this.controller, this.show = false, this.colors})
+  const ControlBarwidget({Key? key, required this.controller, this.colors})
       : super(key: key);
 
   @override
@@ -25,7 +24,6 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
   @override
   void initState() {
     super.initState();
-    _show = widget.show;
     shouldPlay = widget.controller.value.youtubePlayerStatus ==
         YoutubePlayerStatus.initialized;
     setState(() => {});
@@ -45,17 +43,16 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
 
     if (widget.controller.value.youtubePlayerStatus ==
         YoutubePlayerStatus.ended) _anime.reverse();
-
-    if (oldWidget.show != widget.show) {
-      _show = widget.show;
-      setState(() => {});
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return _show != null && _show!
-        ? Container(
+    _show = InheritedState.of(context).show;
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        if (_show != null && _show!)
+          Container(
             // color: Colors.pink,
             width: Utils.blockWidth * 50,
             constraints: BoxConstraints(
@@ -80,14 +77,15 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                                 .round(),
                           ),
                         );
+                        widget.controller.play();
                       },
                       child: Center(
                         child: SizedBox(
                           child: Icon(
                             Icons.replay_10_outlined,
-                            size: Utils.blockWidth * 8 > 50
+                            size: Utils.blockWidth * 7 > 50
                                 ? 50
-                                : Utils.blockWidth * 8,
+                                : Utils.blockWidth * 7,
                             color: widget.colors!.iconsColor,
                           ),
                         ),
@@ -113,22 +111,14 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                           child: widget.controller.value.buffering == true ||
                                   widget.controller.value.youtubePlayerStatus ==
                                       YoutubePlayerStatus.notInitialized
-                              ? SizedBox(
-                                  height: Utils.blockWidth * 10,
-                                  width: Utils.blockWidth * 10,
-                                  child: const CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor:
-                                        AlwaysStoppedAnimation(Colors.white),
-                                  ),
-                                )
+                              ? const SizedBox()
                               : AnimatedIcon(
                                   progress: _anime,
                                   icon: AnimatedIcons.play_pause,
                                   color: widget.colors!.iconsColor,
-                                  size: Utils.blockWidth * 10 > 55
+                                  size: Utils.blockWidth * 8.5 > 55
                                       ? 55
-                                      : Utils.blockWidth * 10,
+                                      : Utils.blockWidth * 8.5,
                                 ),
                         ),
                       ),
@@ -143,14 +133,15 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                                 .round(),
                           ),
                         );
+                        widget.controller.play();
                       },
                       child: Center(
                         child: SizedBox(
                           child: Icon(
                             Icons.forward_10_outlined,
-                            size: Utils.blockWidth * 8 > 50
+                            size: Utils.blockWidth * 7 > 50
                                 ? 50
-                                : Utils.blockWidth * 8,
+                                : Utils.blockWidth * 7,
                             color: widget.colors!.iconsColor,
                           ),
                         ),
@@ -161,6 +152,22 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
               ),
             ),
           )
-        : const SizedBox();
+        else
+          const SizedBox(),
+        if (widget.controller.value.buffering == true ||
+            widget.controller.value.youtubePlayerStatus ==
+                YoutubePlayerStatus.notInitialized)
+          SizedBox(
+            height: Utils.blockWidth * 17,
+            width: Utils.blockWidth * 17,
+            child: const CircularProgressIndicator(
+              strokeWidth: 2.5,
+              valueColor: AlwaysStoppedAnimation(Colors.white),
+            ),
+          )
+        else
+          const SizedBox(),
+      ],
+    );
   }
 }

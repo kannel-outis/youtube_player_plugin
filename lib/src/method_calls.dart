@@ -92,12 +92,19 @@ class YoutubePlayerMethodCall {
     return await _channel.invokeMethod("bufferedPosition") as int;
   }
 
-  ///////////////////
-  static Future<void> doSomethingSilly(String link, String quality) async {
-    var something = await _channel.invokeMethod("doSomethingSilly", {
-      "link": link,
-      "quality": quality,
-    });
-    log(something.toString());
+  static Future<void> videoQualityChange(
+      {String? audioLink,
+      String? videoLink,
+      String? youtubeLink,
+      String? quality}) async {
+    await _channel.invokeMethod(
+      "videoQualityChange",
+      {
+        "audio": audioLink,
+        "video": videoLink,
+        "youtubeLink": youtubeLink,
+        "quality": quality,
+      },
+    );
   }
 }

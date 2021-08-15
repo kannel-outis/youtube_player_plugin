@@ -136,7 +136,9 @@ class RenderSizedAspectRatioWidget extends RenderProxyBox {
       width = height * _aspectRatio;
     }
 
-    if (_plusSize != null) {
+    if (_plusSize != null &&
+        !_plusSize!.height.isNegative &&
+        !_plusSize!.width.isNegative) {
       return constraints.constrain(
           Size(width + _plusSize!.width, height + _plusSize!.height));
     } else {

@@ -9,10 +9,10 @@ class TestingPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(),
       body: Container(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => YoutubePlayerMethodCall.doSomethingSilly(
-            "https://www.youtube.com/watch?v=X3Ai6osw3Mk", "240p"),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => YoutubePlayerMethodCall.doSomethingSilly(
+      //       "https://www.youtube.com/watch?v=X3Ai6osw3Mk", "240p"),
+      // ),
     );
   }
 }
