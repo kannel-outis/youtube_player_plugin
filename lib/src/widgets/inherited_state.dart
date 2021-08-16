@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:youtube_player/src/controller.dart';
 import 'package:youtube_player/src/utils/typedef.dart';
+import 'package:youtube_player/youtube_player.dart';
 
 class InheritedState extends InheritedWidget {
   final bool show;
@@ -26,7 +27,6 @@ class InheritedState extends InheritedWidget {
       onVisibilityToggle?.call(show);
     }
 
-    return show != oldWidget.show ||
-        oldWidget.controller!.value != controller!.value;
+    return show != oldWidget.show;
   }
 }

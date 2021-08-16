@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:youtube_player/youtube_player.dart';
 
 void main() {
   const MethodChannel channel = MethodChannel('youtube_player');

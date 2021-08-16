@@ -13,7 +13,7 @@ class ModalSheet extends StatefulWidget {
 class _ModalSheetState extends State<ModalSheet>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final scaleAnimation;
+  late final Animation<double> scaleAnimation;
   late final PageController _pageController;
 
   @override
@@ -33,17 +33,6 @@ class _ModalSheetState extends State<ModalSheet>
     super.initState();
   }
 
-  @override
-  void didUpdateWidget(covariant ModalSheet oldWidget) {
-    if (oldWidget.controller!.value.quality !=
-        widget.controller!.value.quality) {
-      setState(() {});
-      print(
-          "${widget.controller!.value.quality.qualityToString} + ::::::::::::::::::::::");
-    }
-    super.didUpdateWidget(oldWidget);
-  }
-
   final Map<String, YoutubePlayerVideoQuality> _qualityMap = {
     "Auto": YoutubePlayerVideoQuality.auto,
     "144": YoutubePlayerVideoQuality.quality_144p,
@@ -57,7 +46,7 @@ class _ModalSheetState extends State<ModalSheet>
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
-      height: 200 + (175 * (scaleAnimation.value as double)),
+      height: 200 + (175 * scaleAnimation.value),
       margin: EdgeInsets.symmetric(horizontal: Utils.blockWidth * 10),
       child: PageView(
         controller: _pageController,
@@ -90,17 +79,6 @@ class _ModalSheetState extends State<ModalSheet>
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                // children: _qualityMap.entries
-                //     .map((e) => Container(
-                //           padding: const EdgeInsets.only(left: 20),
-                //           height: 50,
-                //           width: double.infinity,
-                //           child: Align(
-                //             alignment: Alignment.centerLeft,
-                //             child: Text(e.key),
-                //           ),
-                //         ))
-                //     .toList(),
                 children: [
                   InkWell(
                     onTap: () {
@@ -123,9 +101,11 @@ class _ModalSheetState extends State<ModalSheet>
                           onTap: () {
                             if (widget.controller != null) {
                               widget.controller!.videoQualityChange(
-                                  youtubeLink: widget.controller!.youtubeLink,
-                                  quality: e.value.qualityToString);
+                                youtubeLink: widget.controller!.youtubeLink,
+                                quality: e.value,
+                              );
                             }
+                            Navigator.pop(context);
                           },
                           child: Container(
                             padding: const EdgeInsets.only(left: 20),

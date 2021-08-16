@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_player/youtube_player.dart';
 
 class TestingPage extends StatelessWidget {
   const TestingPage({Key? key}) : super(key: key);

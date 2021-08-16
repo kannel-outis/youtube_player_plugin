@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:youtube_player/src/method_calls.dart';
+import 'package:youtube_player/youtube_player.dart';
 
 import 'utils/enums.dart';
 import 'utils/extensions.dart';
@@ -72,19 +73,23 @@ class _YoutubeControllerValue extends Equatable {
 
 class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
   YoutubePlayerController.links(
-      {required String audioLink, required String videoLink})
+      {required String audioLink,
+      required String videoLink,
+      required YoutubePlayerVideoQuality quality})
       : _audioLink = audioLink,
         _videoLink = videoLink,
+        _quality = quality.qualityToString,
         super(const _YoutubeControllerValue());
   YoutubePlayerController.link(
-      {required String youtubeLink, String quality = "144p"})
+      {required String youtubeLink, required YoutubePlayerVideoQuality quality})
       : _youtubeLink = youtubeLink,
-        _quality = quality,
+        _quality = quality.qualityToString,
         super(const _YoutubeControllerValue());
 
   bool get isDisposed => _isDisposed;
   bool get isInitialized =>
       value.youtubePlayerStatus == YoutubePlayerStatus.initialized;
+  bool get videoEnded => value.youtubePlayerStatus == YoutubePlayerStatus.ended;
   bool _isDisposed = false;
   int? _textureId;
   int? get textureId => _textureId;
@@ -92,7 +97,7 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
   String? _youtubeLink;
   late final String _audioLink;
   late final String _videoLink;
-  String? _quality;
+  late final String _quality;
 
   // ignore: cancel_subscriptions, use_late_for_private_fields_and_variables
   StreamSubscription<Map<String, dynamic>>? _eventSubscription;
@@ -101,8 +106,10 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
   Timer? _timer = null;
   Timer? _bTimer;
 
+  // ignore: use_late_for_private_fields_and_variables
   YoutubePlayerAppLifeCycleObserver? _appLifeCycleObserver;
 
+  // ignore: use_late_for_private_fields_and_variables
   Completer? _readyToPlayInit;
 
   Future<void> initController() async {
@@ -205,6 +212,10 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
     }
     final _position = await position();
     // final _bPosition = await bufferedPosition;
+    if (value.youtubePlayerStatus == YoutubePlayerStatus.ended) {
+      _status = YoutubePlayerStatus.ended;
+      _timer?.cancel();
+    }
     value = value.copywidth(
       youtubePlayerStatus: _status,
       position: _position,
@@ -255,10 +266,10 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
       {String? audioLink,
       String? videoLink,
       String? youtubeLink,
-      String? quality}) async {
+      required YoutubePlayerVideoQuality quality}) async {
     await YoutubePlayerMethodCall.videoQualityChange(
         audioLink: audioLink,
-        quality: quality,
+        quality: quality.qualityToString,
         videoLink: videoLink,
         youtubeLink: youtubeLink);
   }

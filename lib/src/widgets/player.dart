@@ -19,8 +19,7 @@ class _PlayerState extends State<Player> {
     print(widget.controller.value.duration);
     print(widget.controller.value.youtubePlayerStatus);
     print(widget.controller.value.quality);
-    print(
-        "${widget.controller.value.buffering}:::::::: :::::::::::::::::::::::::::::");
+
     if (!mounted) return;
     if (widget.controller.textureId != _textureId) {
       _textureId = widget.controller.textureId;

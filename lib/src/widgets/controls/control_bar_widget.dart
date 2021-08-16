@@ -167,6 +167,16 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
           )
         else
           const SizedBox(),
+        // if (widget.controller.value.youtubePlayerStatus ==
+        //     YoutubePlayerStatus.ended)
+        //   IconButton(
+        //     onPressed: () {
+        //       widget.controller.seekTo(Duration.zero);
+        //     },
+        //     icon: const Icon(Icons.replay_outlined),
+        //   )
+        // else
+        //   const SizedBox(),
       ],
     );
   }

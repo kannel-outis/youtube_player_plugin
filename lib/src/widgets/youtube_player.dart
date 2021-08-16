@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:youtube_player/src/utils/extensions.dart';
 import 'package:youtube_player/src/utils/typedef.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/src/widgets/inherited_state.dart';
@@ -16,11 +18,13 @@ const _duration = Duration(milliseconds: 100);
 class YoutubePlayer extends StatefulWidget {
   final YoutubePlayerController controller;
   final OnVisibilityChange? onVisibilityChange;
+  final OnVideoQualityChange? onVideoQualityChange;
 
   YoutubePlayer({
     Key? key,
     required this.controller,
     this.onVisibilityChange,
+    this.onVideoQualityChange,
     YoutubePlayerColors colors = const YoutubePlayerColors.auto(),
   })  : _colors = colors,
         super(key: key);
@@ -31,6 +35,7 @@ class YoutubePlayer extends StatefulWidget {
     required Widget controls,
     required Widget progress,
     this.onVisibilityChange,
+    this.onVideoQualityChange,
   })  : _toolBarControl = toolBarControl,
         _controls = controls,
         _progress = progress,
@@ -51,11 +56,13 @@ class YoutubePlayer extends StatefulWidget {
 class _YoutubePlayerState extends State<YoutubePlayer>
     with SingleTickerProviderStateMixin {
   late AnimationController _animeController;
+  YoutubePlayerVideoQuality quality = YoutubePlayerVideoQuality.auto;
   Timer? _ticker;
   bool show = true;
   @override
   void initState() {
     super.initState();
+    quality = widget.controller.value.quality;
     widget.controller
       ..addListener(_listener)
       ..initController();
@@ -80,6 +87,16 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 
   void _listener() {
     if (mounted) setState(() {});
+    if (quality != widget.controller.value.quality) {
+      quality = widget.controller.value.quality;
+      widget.onVideoQualityChange?.call(quality);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant YoutubePlayer oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
   }
 
   @override

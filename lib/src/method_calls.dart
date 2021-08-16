@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'dart:developer';
 import 'utils/enums.dart';
 
 // ignore: avoid_classes_with_only_static_members
@@ -24,7 +23,7 @@ class YoutubePlayerMethodCall {
       {String? audioLink,
       String? videoLink,
       String? youtubeLink,
-      String? quality}) async {
+      required String quality}) async {
     final readyToPlay = await _channel.invokeMethod(
       "initPlayer",
       {
@@ -61,7 +60,6 @@ class YoutubePlayerMethodCall {
         break;
       case ChangeYoutubePlayeStatus.pause:
         final status = await _channel.invokeMethod("pause");
-        print(status);
         if (status["status"] == "paused") {
           youtubeStatus = YoutubePlayerStatus.paused;
         }
@@ -96,7 +94,7 @@ class YoutubePlayerMethodCall {
       {String? audioLink,
       String? videoLink,
       String? youtubeLink,
-      String? quality}) async {
+      required String quality}) async {
     await _channel.invokeMethod(
       "videoQualityChange",
       {

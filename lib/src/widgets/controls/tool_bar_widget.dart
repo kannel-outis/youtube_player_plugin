@@ -19,11 +19,11 @@ class ToolBarWidget extends StatefulWidget {
 class _ToolBarWidgetState extends State<ToolBarWidget> {
   bool? _show;
 
-  @override
-  void didUpdateWidget(covariant ToolBarWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    setState(() {});
-  }
+  // @override
+  // void didUpdateWidget(covariant ToolBarWidget oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -46,21 +46,13 @@ class _ToolBarWidgetState extends State<ToolBarWidget> {
                   child: Row(
                     children: [
                       IconButton(
-                        onPressed: () {
-                          showModalBottomSheet(
-                            backgroundColor: Colors.transparent,
-                            context: context,
-                            builder: (context) =>
-                                StatefulBuilder(builder: (context, ss) {
-                              //   if (widgetcontroller!.value.quality !=
-                              //     widget.controller!.value.quality) {
-                              //   setState(() {});
-                              // }
-                              return ModalSheet(
-                                controller: widget.controller,
-                              );
-                            }),
-                          );
+                        onPressed: () async {
+                          await showModalBottomSheet(
+                              backgroundColor: Colors.transparent,
+                              context: context,
+                              builder: (context) => ModalSheet(
+                                    controller: widget.controller,
+                                  ));
                         },
                         icon: Icon(
                           Icons.more_vert_outlined,

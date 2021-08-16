@@ -31,7 +31,9 @@ class ExoPlayerIm {
 
          fun setUpPlayer(streamLinks:StreamLinks, context:android.content.Context, surfaceManager:SurfaceTextureManagerClass, eventChannel: EventChannel): Boolean{
             exoplayer =  SimpleExoPlayer.Builder(context).build()
-
+             exoplayer!!.addListener(
+                     ListenerF()
+             )
             val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
             val vUri = Uri.parse(streamLinks.videoLink)
             val aUri  = Uri.parse(streamLinks.audioLink)
@@ -45,9 +47,7 @@ class ExoPlayerIm {
              readyToPlay = true
              quality = streamLinks.quality
 
-             exoplayer!!.addListener(
-                 ListenerF()
-             )
+
              eventChannel.setStreamHandler(
                object :  EventChannel.StreamHandler{
                    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
