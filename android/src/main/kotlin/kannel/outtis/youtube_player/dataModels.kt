@@ -10,7 +10,8 @@ data class EventError(
 
 data class StreamLinks(
     val audioLink:String?,
-    val videoLink:String?
+    val videoLink:String?,
+    val quality:String
 
 )
 

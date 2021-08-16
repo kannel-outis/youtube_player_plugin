@@ -23,17 +23,18 @@ class ExoPlayerIm {
        private var exoplayer:SimpleExoPlayer? = null
         private val eventSink:EventSink = EventSink()
         private var readyToPlay:Boolean = false
+        private var quality:String? = null
 
         fun getExoPlayerInstance():SimpleExoPlayer{
             return exoplayer!!
         }
 
-         fun setUpPlayer(videoUrl:String, audioUrl:String, context:android.content.Context, surfaceManager:SurfaceTextureManagerClass, eventChannel: EventChannel): Boolean{
-
+         fun setUpPlayer(streamLinks:StreamLinks, context:android.content.Context, surfaceManager:SurfaceTextureManagerClass, eventChannel: EventChannel): Boolean{
             exoplayer =  SimpleExoPlayer.Builder(context).build()
+
             val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
-            val vUri = Uri.parse(videoUrl)
-            val aUri  = Uri.parse(audioUrl)
+            val vUri = Uri.parse(streamLinks.videoLink)
+            val aUri  = Uri.parse(streamLinks.audioLink)
             val vSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
                 MediaItem.fromUri(vUri))
             val aSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
@@ -42,6 +43,8 @@ class ExoPlayerIm {
             exoplayer!!.setMediaSource(mediaSource)
              exoplayer!!.prepare()
              readyToPlay = true
+             quality = streamLinks.quality
+
              exoplayer!!.addListener(
                  ListenerF()
              )
@@ -78,6 +81,7 @@ class ExoPlayerIm {
                 val mediaSource: MediaSource = MergingMediaSource(vSource, aSource)
                 exoplayer!!.setMediaSource(mediaSource)
                 exoplayer!!.seekTo(position)
+                quality = streamLinks.quality
             }
         }
 
@@ -141,13 +145,16 @@ class ExoPlayerIm {
 
 
             override fun onPlaybackStateChanged(state: Int) {
-                val event: MutableMap<String, Any> = HashMap()
+                val event: MutableMap<String, Any?> = HashMap()
                 when(state){
                     Player.STATE_READY -> {
 //                            readyToPlay = true
                         event["statusEvent"] = mapOf("playerStatus" to "state_ready")
                         event["playerReady"] = readyToPlay
                         event["duration"] = exoplayer!!.duration
+                        event["quality"] = quality
+                        Log.d("bufferingData:::::::", "$quality")
+
 
                     }
                     Player.STATE_ENDED -> {

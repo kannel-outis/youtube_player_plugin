@@ -17,6 +17,7 @@ enum ChangeYoutubePlayeStatus {
 }
 
 enum YoutubePlayerVideoQuality {
+  auto,
   quality_144p,
   quality_240p,
   quality_480p,

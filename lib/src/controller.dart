@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:youtube_player/src/method_calls.dart';
 
 import 'utils/enums.dart';
+import 'utils/extensions.dart';
 import 'utils/life_cycle.dart';
 
 class _YoutubeControllerValue extends Equatable {
@@ -15,16 +16,17 @@ class _YoutubeControllerValue extends Equatable {
   final int? percentageBuffered;
   final Duration bufferedPosition;
   final Duration duration;
+  final YoutubePlayerVideoQuality quality;
 
-  const _YoutubeControllerValue({
-    this.position = const Duration(),
-    this.size,
-    this.youtubePlayerStatus = YoutubePlayerStatus.notInitialized,
-    this.percentageBuffered,
-    this.buffering = false,
-    this.duration = const Duration(),
-    this.bufferedPosition = const Duration(),
-  });
+  const _YoutubeControllerValue(
+      {this.position = const Duration(),
+      this.size,
+      this.youtubePlayerStatus = YoutubePlayerStatus.notInitialized,
+      this.percentageBuffered,
+      this.buffering = false,
+      this.duration = const Duration(),
+      this.bufferedPosition = const Duration(),
+      this.quality = YoutubePlayerVideoQuality.auto});
 
   double get aspectRatio {
     if (size != null) {
@@ -42,6 +44,7 @@ class _YoutubeControllerValue extends Equatable {
     int? percentageBuffered,
     Duration? duration,
     Duration? bufferedPosition,
+    YoutubePlayerVideoQuality? quality,
   }) {
     return _YoutubeControllerValue(
       buffering: buffering ?? this.buffering,
@@ -51,6 +54,7 @@ class _YoutubeControllerValue extends Equatable {
       size: size ?? this.size,
       youtubePlayerStatus: youtubePlayerStatus ?? this.youtubePlayerStatus,
       bufferedPosition: bufferedPosition ?? this.bufferedPosition,
+      quality: quality ?? this.quality,
     );
   }
 
@@ -78,9 +82,13 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
         _quality = quality,
         super(const _YoutubeControllerValue());
 
+  bool get isDisposed => _isDisposed;
+  bool get isInitialized =>
+      value.youtubePlayerStatus == YoutubePlayerStatus.initialized;
   bool _isDisposed = false;
   int? _textureId;
   int? get textureId => _textureId;
+  String? get youtubeLink => _youtubeLink;
   String? _youtubeLink;
   late final String _audioLink;
   late final String _videoLink;
@@ -120,9 +128,12 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
       _readyToPlayInit = Completer();
 
       if (event.containsKey("playerReady") && event['playerReady'] == true) {
+        final quality = event["quality"] as String;
+
         value = value.copywidth(
             duration: Duration(milliseconds: event['duration'] as int),
-            youtubePlayerStatus: YoutubePlayerStatus.initialized);
+            youtubePlayerStatus: YoutubePlayerStatus.initialized,
+            quality: quality.stringToQuality);
         _bTimer = Timer.periodic(const Duration(milliseconds: 500), _bTicker);
         _readyToPlayInit!.complete(null);
       }
@@ -252,13 +263,22 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
         youtubeLink: youtubeLink);
   }
 
+  String? get videoId {
+    if (_youtubeLink != null) {
+      final regex = RegExp(
+          r'.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*');
+      return regex.firstMatch(_youtubeLink!)?.group(1);
+    }
+    return null;
+  }
+
   @override
   void dispose() {
-    YoutubePlayerMethodCall.dispose();
     _appLifeCycleObserver!.dispose();
     _eventSubscription!.cancel();
     _bTimer?.cancel();
     _timer?.cancel();
+    YoutubePlayerMethodCall.dispose();
     _isDisposed = true;
     super.dispose();
   }

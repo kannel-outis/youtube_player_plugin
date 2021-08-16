@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player/src/controller.dart';
 import 'package:youtube_player/src/utils/utils.dart';
+import 'package:youtube_player/youtube_player.dart';
 
 class Player extends StatefulWidget {
   final YoutubePlayerController controller;
@@ -17,7 +18,7 @@ class _PlayerState extends State<Player> {
     print(widget.controller.value.position);
     print(widget.controller.value.duration);
     print(widget.controller.value.youtubePlayerStatus);
-    print(widget.controller.value.percentageBuffered);
+    print(widget.controller.value.quality);
     print(
         "${widget.controller.value.buffering}:::::::: :::::::::::::::::::::::::::::");
     if (!mounted) return;
@@ -33,7 +34,9 @@ class _PlayerState extends State<Player> {
     if (mounted) {
       _textureId = widget.controller.textureId;
       setS();
-      widget.controller.addListener(_listener);
+      if (!widget.controller.isDisposed) {
+        widget.controller.addListener(_listener);
+      }
     }
   }
 
@@ -46,14 +49,11 @@ class _PlayerState extends State<Player> {
   @override
   void didUpdateWidget(covariant Player oldWidget) {
     super.didUpdateWidget(oldWidget);
-    oldWidget.controller.removeListener(_listener);
-    _textureId = widget.controller.textureId;
-    widget.controller.addListener(_listener);
-  }
-
-  @override
-  void deactivate() {
-    super.deactivate();
+    if (!widget.controller.isDisposed) {
+      oldWidget.controller.removeListener(_listener);
+      _textureId = widget.controller.textureId;
+      widget.controller.addListener(_listener);
+    }
   }
 
   @override

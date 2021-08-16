@@ -224,7 +224,7 @@ class YtExtractorClass{
         }
         }
         audioLink = ytFiles.get(140)!!.url
-        return StreamLinks(audioLink = audioLink, videoLink = videoLink)
+        return StreamLinks(audioLink = audioLink, videoLink = videoLink, quality = quality)
     }
 
 

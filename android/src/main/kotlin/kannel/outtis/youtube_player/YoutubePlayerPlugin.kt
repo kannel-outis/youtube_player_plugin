@@ -51,6 +51,7 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
 
           }
           "initSurface" -> {
+              ExoPlayerIm.dispose()
               textureId = surfaceManager.initSurface()
               result.success(textureId)
           }
@@ -74,7 +75,8 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
                           links["audio"] = it.audioLink
                           links["video"] = it.videoLink
                           eventChannel = EventChannel(messenger, "youtube-player + $textureId")
-                          val readyToPlay =  ExoPlayerIm.setUpPlayer(audioUrl = it.audioLink!!, videoUrl = it.videoLink!!, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
+
+                          val readyToPlay =  ExoPlayerIm.setUpPlayer(streamLinks = it, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
                           links["readyToPlay"] = readyToPlay
                           result.success(links)
 //                      }
@@ -82,7 +84,8 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
                   }
               }else{
                   eventChannel = EventChannel(messenger, "youtube-player + $textureId")
-                  val readyToPlay =  ExoPlayerIm.setUpPlayer(audioUrl = audioUrl!!, videoUrl = videoUrl!!, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
+                  val streamLinks = StreamLinks(audioLink= audioUrl,  videoLink = videoUrl, quality = quality!!);
+                  val readyToPlay =  ExoPlayerIm.setUpPlayer(streamLinks = streamLinks, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
                   result.success(readyToPlay);
               }
 
@@ -98,7 +101,7 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
                       ExoPlayerIm.onVideoQualityChange(it)
                   }
               }else{
-                  val streamLinks = StreamLinks(audioUrl, videoUrl)
+                  val streamLinks = StreamLinks(audioUrl, videoUrl, quality!!)
                   ExoPlayerIm.onVideoQualityChange(streamLinks)
               }
 

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:youtube_player/src/utils/typedef.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/src/widgets/inherited_state.dart';
@@ -69,9 +68,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 
   void setShowToFalseAfterTimer(int time) {
     if (show) {
-      print("value");
       _ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
-        print(timer.tick);
         if (timer.tick == time) {
           show = false;
           setState(() {});
@@ -83,13 +80,6 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 
   void _listener() {
     if (mounted) setState(() {});
-    // if (widget.controller.value.youtubePlayerStatus ==
-    //         YoutubePlayerStatus.initialized &&
-    //     show == false) {
-    //   show = true;
-    //   setState(() {});
-    //   setShowToFalseAfterTimer(7);
-    // }
   }
 
   @override
@@ -104,6 +94,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   Widget build(BuildContext context) {
     return InheritedState(
       show: show,
+      controller: widget.controller,
       onVisibilityToggle: (newShowState) {
         show = newShowState;
         widget.onVisibilityChange?.call(show);
@@ -168,16 +159,18 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                     widget._toolBarControl ??
                         ToolBarWidget(
                           controller: widget.controller,
-                          show: show,
                           colors: widget.colors,
                         ),
 
                     // control sec
-                    widget._controls ??
-                        ControlBarwidget(
-                          controller: widget.controller,
-                          colors: widget.colors,
-                        ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 20),
+                      child: widget._controls ??
+                          ControlBarwidget(
+                            controller: widget.controller,
+                            colors: widget.colors,
+                          ),
+                    ),
 
                     // bottom buffer, progress, thumb and shit
                     widget._progress ??
