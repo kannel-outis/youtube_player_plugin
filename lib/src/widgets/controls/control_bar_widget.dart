@@ -91,36 +91,59 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                         ),
                       ),
                     ),
-                    InkWell(
-                      onTap: () {
-                        if (widget.controller.value.youtubePlayerStatus ==
-                                YoutubePlayerStatus.initialized ||
-                            widget.controller.value.youtubePlayerStatus ==
-                                YoutubePlayerStatus.paused) {
-                          _anime.forward();
-                          widget.controller.play();
-                        } else if (widget
-                                .controller.value.youtubePlayerStatus ==
-                            YoutubePlayerStatus.playing) {
-                          _anime.reverse();
-                          widget.controller.pause();
-                        }
-                      },
-                      child: Center(
-                        child: SizedBox(
-                          child: widget.controller.value.buffering == true ||
-                                  widget.controller.value.youtubePlayerStatus ==
-                                      YoutubePlayerStatus.notInitialized
-                              ? const SizedBox()
-                              : AnimatedIcon(
-                                  progress: _anime,
-                                  icon: AnimatedIcons.play_pause,
-                                  color: widget.colors!.iconsColor,
-                                  size: Utils.blockWidth * 8.5 > 55
-                                      ? 55
-                                      : Utils.blockWidth * 8.5,
-                                ),
-                        ),
+                    Center(
+                      child: SizedBox(
+                        child: widget.controller.value.buffering == true ||
+                                widget.controller.value.youtubePlayerStatus ==
+                                    YoutubePlayerStatus.notInitialized
+                            ? const SizedBox()
+                            : widget.controller.value.youtubePlayerStatus !=
+                                    YoutubePlayerStatus.ended
+                                ? InkWell(
+                                    onTap: () {
+                                      if (widget.controller.value
+                                                  .youtubePlayerStatus ==
+                                              YoutubePlayerStatus.initialized ||
+                                          widget.controller.value
+                                                  .youtubePlayerStatus ==
+                                              YoutubePlayerStatus.paused) {
+                                        _anime.forward();
+                                        widget.controller.play();
+                                      } else if (widget.controller.value
+                                              .youtubePlayerStatus ==
+                                          YoutubePlayerStatus.playing) {
+                                        _anime.reverse();
+                                        widget.controller.pause();
+                                      }
+                                    },
+                                    child: AnimatedIcon(
+                                      progress: _anime,
+                                      icon: AnimatedIcons.play_pause,
+                                      color: widget.colors!.iconsColor,
+                                      size: Utils.blockWidth * 8.5 > 55
+                                          ? 55
+                                          : Utils.blockWidth * 8.5,
+                                    ),
+                                  )
+                                : InkWell(
+                                    onTap: () {
+                                      widget.controller.seekTo(
+                                        Duration(
+                                          milliseconds:
+                                              (const Duration().inMilliseconds)
+                                                  .round(),
+                                        ),
+                                      );
+                                      _anime.forward();
+                                      widget.controller.play();
+                                    },
+                                    child: Icon(
+                                      Icons.replay,
+                                      size: Utils.blockWidth * 8.5 > 55
+                                          ? 55
+                                          : Utils.blockWidth * 8.5,
+                                    ),
+                                  ),
                       ),
                     ),
                     InkWell(

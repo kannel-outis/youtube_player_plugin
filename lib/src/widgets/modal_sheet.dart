@@ -33,26 +33,29 @@ class _ModalSheetState extends State<ModalSheet>
     super.initState();
   }
 
-  final Map<String, YoutubePlayerVideoQuality> _qualityMap = {
-    "Auto": YoutubePlayerVideoQuality.auto,
-    "144": YoutubePlayerVideoQuality.quality_144p,
-    "240": YoutubePlayerVideoQuality.quality_240p,
-    "480": YoutubePlayerVideoQuality.quality_480p,
-    "720": YoutubePlayerVideoQuality.quality_720p,
-    "1080": YoutubePlayerVideoQuality.quality_1080p,
-  };
+  final List<YoutubePlayerVideoQuality> _listOfQualities = [
+    YoutubePlayerVideoQuality.auto,
+    YoutubePlayerVideoQuality.quality_144p,
+    YoutubePlayerVideoQuality.quality_240p,
+    YoutubePlayerVideoQuality.quality_480p,
+    YoutubePlayerVideoQuality.quality_720p,
+    YoutubePlayerVideoQuality.quality_1080p,
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final plusHeight = Utils.blockHeight > 550 ? 250 : 150;
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
-      height: 200 + (175 * scaleAnimation.value),
-      margin: EdgeInsets.symmetric(horizontal: Utils.blockWidth * 10),
+      height: Utils.blockHeight * 21 + (plusHeight * scaleAnimation.value),
+      margin: Utils.blockWidth * 100 > 550
+          ? EdgeInsets.symmetric(horizontal: Utils.blockWidth * 10)
+          : const EdgeInsets.all(0),
       child: PageView(
         controller: _pageController,
         children: [
           Container(
-            padding: const EdgeInsets.all(25),
+            padding: EdgeInsets.all(Utils.blockWidth * 5),
             child: Column(
               children: [
                 InkWell(
@@ -74,7 +77,10 @@ class _ModalSheetState extends State<ModalSheet>
           ),
           Container(
             // color: Colors.black,
-            padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
+            padding: EdgeInsets.only(
+                right: Utils.blockWidth * 5,
+                bottom: Utils.blockWidth * 5,
+                top: Utils.blockWidth * 5),
 
             child: SingleChildScrollView(
               child: Column(
@@ -87,37 +93,59 @@ class _ModalSheetState extends State<ModalSheet>
                           duration: const Duration(milliseconds: 200),
                           curve: Curves.easeInOut);
                     },
-                    child: const SizedBox(
-                      height: 50,
-                      width: double.infinity,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Icon(Icons.arrow_back),
-                      ),
-                    ),
-                  ),
-                  ..._qualityMap.entries.toList().map(
-                        (e) => InkWell(
-                          onTap: () {
-                            if (widget.controller != null) {
-                              widget.controller!.videoQualityChange(
-                                youtubeLink: widget.controller!.youtubeLink,
-                                quality: e.value,
-                              );
-                            }
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.only(left: 20),
-                            height: 50,
-                            width: double.infinity,
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(e.key),
-                            ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 25),
+                      child: SizedBox(
+                        height: Utils.blockHeight * 3,
+                        width: double.infinity,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Icon(
+                            Icons.arrow_back,
+                            size: Utils.blockWidth * 4,
                           ),
                         ),
                       ),
+                    ),
+                  ),
+                  ..._listOfQualities.map(
+                    (e) => InkWell(
+                      onTap: () {
+                        if (widget.controller != null) {
+                          widget.controller!.videoQualityChange(
+                            youtubeLink: widget.controller!.youtubeLink,
+                            quality: e,
+                          );
+                        }
+                        Navigator.pop(context);
+                      },
+                      child: SizedBox(
+                        height: Utils.blockHeight * 15 / 3,
+                        width: double.infinity,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 50,
+                                child: e == widget.controller!.value.quality
+                                    ? Icon(
+                                        Icons.done,
+                                        size: Utils.blockWidth * 4,
+                                      )
+                                    : const SizedBox(),
+                              ),
+                              Text(
+                                e.qualityToString,
+                                style:
+                                    TextStyle(fontSize: Utils.blockWidth * 3),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -129,7 +157,7 @@ class _ModalSheetState extends State<ModalSheet>
 
   Widget buildModalTile(String title, IconData icon, String label) {
     return SizedBox(
-      height: 150 / 3,
+      height: (Utils.blockHeight * 15) / 3,
       width: double.infinity,
       child: Row(
         children: [

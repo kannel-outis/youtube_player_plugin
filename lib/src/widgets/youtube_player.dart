@@ -17,6 +17,7 @@ const _duration = Duration(milliseconds: 100);
 // ignore_for_file: must_be_immutable, avoid_init_to_null
 class YoutubePlayer extends StatefulWidget {
   final YoutubePlayerController controller;
+  final Size? size;
   final OnVisibilityChange? onVisibilityChange;
   final OnVideoQualityChange? onVideoQualityChange;
 
@@ -25,6 +26,7 @@ class YoutubePlayer extends StatefulWidget {
     required this.controller,
     this.onVisibilityChange,
     this.onVideoQualityChange,
+    this.size,
     YoutubePlayerColors colors = const YoutubePlayerColors.auto(),
   })  : _colors = colors,
         super(key: key);
@@ -34,6 +36,7 @@ class YoutubePlayer extends StatefulWidget {
     required Widget toolBarControl,
     required Widget controls,
     required Widget progress,
+    this.size,
     this.onVisibilityChange,
     this.onVideoQualityChange,
   })  : _toolBarControl = toolBarControl,
@@ -90,6 +93,10 @@ class _YoutubePlayerState extends State<YoutubePlayer>
     if (quality != widget.controller.value.quality) {
       quality = widget.controller.value.quality;
       widget.onVideoQualityChange?.call(quality);
+    } else if (widget.controller.value.youtubePlayerStatus ==
+        YoutubePlayerStatus.ended) {
+      show = true;
+      setState(() {});
     }
   }
 
@@ -124,7 +131,9 @@ class _YoutubePlayerState extends State<YoutubePlayer>
         children: [
           SizedAspectRatioWidget(
             aspectRatio: widget.controller.value.aspectRatio,
-            additionalSize: const Size(0, 30),
+            additionalSize: widget.size != null
+                ? Size(widget.size!.width + 0, widget.size!.height + 30)
+                : const Size(0, 30),
             child: Container(
               width: double.infinity,
               color: Colors.black,
@@ -136,7 +145,9 @@ class _YoutubePlayerState extends State<YoutubePlayer>
             opacity: _animeController.value,
             child: SizedAspectRatioWidget(
               aspectRatio: widget.controller.value.aspectRatio,
-              additionalSize: const Size(0, 30),
+              additionalSize: widget.size != null
+                  ? Size(widget.size!.width + 0, widget.size!.height + 30)
+                  : const Size(0, 30),
               child: Container(
                 width: double.infinity,
                 color: Colors.black.withOpacity(.3),
@@ -165,7 +176,9 @@ class _YoutubePlayerState extends State<YoutubePlayer>
               });
             },
             child: SizedAspectRatioWidget(
-              additionalSize: const Size(0, 36),
+              additionalSize: widget.size != null
+                  ? Size(widget.size!.width + 0, widget.size!.height + 36)
+                  : const Size(0, 36),
               aspectRatio: widget.controller.value.aspectRatio,
               child: SizedBox(
                 width: double.infinity,
