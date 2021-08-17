@@ -77,6 +77,8 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                                 .round(),
                           ),
                         );
+                        if (widget.controller.value.youtubePlayerStatus ==
+                            YoutubePlayerStatus.ended) _anime.forward();
                         widget.controller.play();
                       },
                       child: Center(

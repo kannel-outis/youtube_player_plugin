@@ -88,15 +88,23 @@ class _YoutubePlayerState extends State<YoutubePlayer>
     }
   }
 
+  int listenerCount = 0;
+
   void _listener() {
     if (mounted) setState(() {});
     if (quality != widget.controller.value.quality) {
       quality = widget.controller.value.quality;
       widget.onVideoQualityChange?.call(quality);
     } else if (widget.controller.value.youtubePlayerStatus ==
+        YoutubePlayerStatus.playing) {
+      listenerCount = 0;
+    } else if (widget.controller.value.youtubePlayerStatus ==
         YoutubePlayerStatus.ended) {
-      show = true;
-      setState(() {});
+      listenerCount++;
+      if (listenerCount == 1) {
+        show = true;
+        setState(() {});
+      }
     }
   }
 
@@ -171,7 +179,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                   _ticker = null;
                 } else {
                   show = true;
-                  // setShowToFalseAfterTimer(10);
+                  setShowToFalseAfterTimer(10);
                 }
               });
             },
