@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:youtube_player/src/utils/utils.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/src/widgets/inherited_state.dart';
@@ -42,7 +43,8 @@ class ProgressSecWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final show = InheritedState.of(context).show;
-
+    final showProgress = InheritedState.of(context).showProgress;
+    // print(MediaQuery.of(context).orientation);
     _animateProgress(show);
     return SizedBox(
       child: Column(
@@ -74,47 +76,73 @@ class ProgressSecWidget extends StatelessWidget {
                           ),
                         )
                       ]),
-                      Icon(
-                        Icons.fullscreen,
-                        size: Utils.blockWidth * 3.5 > 30
-                            ? 30
-                            : Utils.blockWidth * 3.5,
+                      IconButton(
+                        onPressed: () {
+                          if (MediaQuery.of(context).orientation ==
+                              Orientation.portrait) {
+                            SystemChrome.setEnabledSystemUIOverlays([]);
+                            SystemChrome.setPreferredOrientations([
+                              DeviceOrientation.landscapeLeft,
+                              DeviceOrientation.landscapeRight,
+                            ]);
+                          } else {
+                            SystemChrome.setEnabledSystemUIOverlays(
+                                SystemUiOverlay.values);
+                            SystemChrome.setPreferredOrientations(
+                              const [
+                                DeviceOrientation.portraitUp,
+                                DeviceOrientation.portraitDown,
+                                DeviceOrientation.landscapeLeft,
+                                DeviceOrientation.landscapeRight,
+                              ],
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          Icons.fullscreen,
+                          size: Utils.blockWidth * 3.5 > 30
+                              ? 30
+                              : Utils.blockWidth * 3.5,
+                        ),
                         color: colors!.iconsColor!.withOpacity(.8),
                       )
                     ],
                   )
                 : const SizedBox(),
           ),
-          SizedBox(height: Utils.blockHeight * 1.3),
-          SizedBox(
-            height: 15,
-            child: ProgressSlider(
-              // 15.0
-              thumbSize: (Utils.blockHeight * 1.2) * animeController!.value,
-              // thumbSize: 15.0 *  animeController!.value,
-              value: controller.value.duration != const Duration()
-                  ? controller.value.position.inMilliseconds /
-                      controller.value.duration.inMilliseconds
-                  : 0.0,
-              bufferedValue: controller.value.duration != const Duration()
-                  ? controller.value.bufferedPosition.inMilliseconds /
-                      controller.value.duration.inMilliseconds
-                  : 0.0,
-              progressBarColor: colors!.progressColor!,
-              barColor: colors!.barColor!.withOpacity(.1),
-              bufferedColor: colors!.bufferedColor!.withOpacity(.4),
-              thumbColor: colors!.thumbColor!,
-              seekTo: (value) {
-                controller.seekTo(
-                  Duration(
-                    milliseconds:
-                        (controller.value.duration.inMilliseconds * value)
-                            .round(),
-                  ),
-                );
-              },
-            ),
-          ),
+          SizedBox(height: Utils.blockWidth * 1.3),
+          if (showProgress)
+            SizedBox(
+              height: 15,
+              child: ProgressSlider(
+                // 15.0
+                thumbSize: (Utils.blockHeight * 1.2) * animeController!.value,
+                // thumbSize: 15.0 *  animeController!.value,
+                value: controller.value.duration != const Duration()
+                    ? controller.value.position.inMilliseconds /
+                        controller.value.duration.inMilliseconds
+                    : 0.0,
+                bufferedValue: controller.value.duration != const Duration()
+                    ? controller.value.bufferedPosition.inMilliseconds /
+                        controller.value.duration.inMilliseconds
+                    : 0.0,
+                progressBarColor: colors!.progressColor!,
+                barColor: colors!.barColor!.withOpacity(.2),
+                bufferedColor: colors!.bufferedColor!.withOpacity(.4),
+                thumbColor: colors!.thumbColor!,
+                seekTo: (value) {
+                  controller.seekTo(
+                    Duration(
+                      milliseconds:
+                          (controller.value.duration.inMilliseconds * value)
+                              .round(),
+                    ),
+                  );
+                },
+              ),
+            )
+          else
+            const SizedBox(),
         ],
       ),
     );

@@ -33,17 +33,12 @@ class _ModalSheetState extends State<ModalSheet>
     super.initState();
   }
 
-  final List<YoutubePlayerVideoQuality> _listOfQualities = [
-    YoutubePlayerVideoQuality.auto,
-    YoutubePlayerVideoQuality.quality_144p,
-    YoutubePlayerVideoQuality.quality_240p,
-    YoutubePlayerVideoQuality.quality_480p,
-    YoutubePlayerVideoQuality.quality_720p,
-    YoutubePlayerVideoQuality.quality_1080p,
-  ];
+  final List<YoutubePlayerVideoQuality> _listOfQualities =
+      YoutubePlayerVideoQuality.values;
 
   @override
   Widget build(BuildContext context) {
+    print(_listOfQualities);
     final plusHeight = Utils.blockHeight > 550 ? 250 : 150;
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,

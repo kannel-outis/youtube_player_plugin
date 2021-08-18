@@ -16,6 +16,9 @@ import com.google.android.exoplayer2.video.VideoSize
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel.Result
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.audio.AudioAttributes
+
 
 class ExoPlayerIm {
 
@@ -45,6 +48,11 @@ class ExoPlayerIm {
             exoplayer!!.setMediaSource(mediaSource)
              exoplayer!!.prepare()
              readyToPlay = true
+             val audioAttributes: AudioAttributes = AudioAttributes.Builder()
+                     .setUsage(C.USAGE_MEDIA)
+                     .setContentType(C.CONTENT_TYPE_MOVIE)
+                     .build()
+             exoplayer!!.setAudioAttributes(audioAttributes, true)
              quality = streamLinks.quality
 
 
@@ -98,17 +106,23 @@ class ExoPlayerIm {
             when(call.method){
                 "play"->{
                     if(exoplayer != null){
-                        exoplayer!!.play()
-                        status["status"] = "playing"
-                        result.success(status)
+                        if(!exoplayer!!.isPlaying){
+                            exoplayer!!.play()
+                            status["status"] = "playing"
+                            result.success(status)
+                        }
+
                     }
 
                 }
                 "pause"->{
                     if(exoplayer != null){
-                        exoplayer!!.pause()
-                        status["status"] = "paused"
-                        result.success(status)
+                        if (exoplayer!!.isPlaying) {
+                            exoplayer!!.pause()
+                            status["status"] = "paused"
+                            result.success(status)
+                        }
+
                     }
 
                 }
@@ -173,6 +187,7 @@ class ExoPlayerIm {
                     Player.STATE_IDLE -> {
                         event["statusEvent"] = mapOf("playerStatus" to "state_idle")
                     }
+
                 }
 
 
@@ -182,6 +197,7 @@ class ExoPlayerIm {
 
 
             }
+
 
             override fun onVideoSizeChanged(videoSize: VideoSize): Unit{
                 val event: MutableMap<String, Any> = HashMap()

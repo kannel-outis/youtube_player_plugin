@@ -9,6 +9,8 @@ extension QualityToString on YoutubePlayerVideoQuality {
         return "720p";
       case YoutubePlayerVideoQuality.quality_480p:
         return "480p";
+      case YoutubePlayerVideoQuality.quality_360p:
+        return "360p";
       case YoutubePlayerVideoQuality.quality_240p:
         return "240p";
       case YoutubePlayerVideoQuality.quality_144p:
@@ -28,6 +30,8 @@ extension StringToQuality on String {
         return YoutubePlayerVideoQuality.quality_720p;
       case "480p":
         return YoutubePlayerVideoQuality.quality_480p;
+      case "360p":
+        return YoutubePlayerVideoQuality.quality_360p;
       case "240p":
         return YoutubePlayerVideoQuality.quality_240p;
       case "144p":

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:youtube_player/src/utils/typedef.dart';
+import 'package:youtube_player/src/utils/utils.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/src/widgets/inherited_state.dart';
 import 'package:youtube_player/youtube_player.dart';
@@ -57,6 +58,7 @@ class YoutubePlayer extends StatefulWidget {
 class _YoutubePlayerState extends State<YoutubePlayer>
     with SingleTickerProviderStateMixin {
   late AnimationController _animeController;
+  bool showProgress = true;
   YoutubePlayerVideoQuality quality = YoutubePlayerVideoQuality.auto;
   Timer? _ticker;
   bool show = true;
@@ -112,6 +114,18 @@ class _YoutubePlayerState extends State<YoutubePlayer>
     super.didUpdateWidget(oldWidget);
   }
 
+  void _showProgress(BuildContext context) {
+    if (MediaQuery.of(context).orientation == Orientation.landscape) {
+      if (show == true) {
+        showProgress = true;
+      } else {
+        showProgress = false;
+      }
+    } else {
+      showProgress = true;
+    }
+  }
+
   @override
   void dispose() {
     _ticker?.cancel();
@@ -122,8 +136,10 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 
   @override
   Widget build(BuildContext context) {
+    _showProgress(context);
     return InheritedState(
       show: show,
+      showProgress: showProgress,
       controller: widget.controller,
       onVisibilityToggle: (newShowState) {
         show = newShowState;
@@ -131,6 +147,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
       },
       stateChange: (b) {
         show = b;
+        _showProgress(context);
         setState(() {});
       },
       child: Stack(
@@ -170,12 +187,14 @@ class _YoutubePlayerState extends State<YoutubePlayer>
             ),
           ),
           _FullScreenOrientation(
+            height: MediaQuery.of(context).size.height - 25,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onDoubleTap: () {
                 show = false;
                 _ticker?.cancel();
                 _ticker = null;
+                _showProgress(context);
                 setState(() {});
                 print("double Tap");
               },
@@ -185,9 +204,11 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                     show = false;
                     _ticker?.cancel();
                     _ticker = null;
+                    _showProgress(context);
                   } else {
                     show = true;
                     setShowToFalseAfterTimer(10);
+                    _showProgress(context);
                   }
                 });
               },
@@ -210,7 +231,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 
                       // control sec
                       Container(
-                        margin: const EdgeInsets.only(bottom: 20),
+                        // margin: const EdgeInsets.only(bottom: 20),
                         child: widget._controls ??
                             ControlBarwidget(
                               controller: widget.controller,
@@ -239,8 +260,11 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 }
 
 class _FullScreenOrientation extends StatelessWidget {
+  final double? height;
+  final double? width;
   // ignore: prefer_const_constructors_in_immutables
-  _FullScreenOrientation({Key? key, required Widget child})
+  _FullScreenOrientation(
+      {Key? key, required Widget child, this.width, this.height})
       : _child = child,
         super(key: key);
   late final Widget _child;
@@ -253,8 +277,8 @@ class _FullScreenOrientation extends StatelessWidget {
     } else {
       SystemChrome.setEnabledSystemUIOverlays([]);
       return SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
+        height: height ?? MediaQuery.of(context).size.height,
+        width: width ?? MediaQuery.of(context).size.width,
         child: _child,
       );
     }

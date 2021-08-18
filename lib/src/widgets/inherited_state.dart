@@ -5,6 +5,7 @@ import 'package:youtube_player/youtube_player.dart';
 
 class InheritedState extends InheritedWidget {
   final bool show;
+  final bool showProgress;
   final YoutubePlayerController? controller;
   final OnVisibilityToggle? onVisibilityToggle;
   final Function(bool)? stateChange;
@@ -14,6 +15,7 @@ class InheritedState extends InheritedWidget {
     this.show = false,
     this.controller,
     this.stateChange,
+    this.showProgress = true,
     required Widget child,
     Key? key,
   }) : super(child: child, key: key);
@@ -27,6 +29,6 @@ class InheritedState extends InheritedWidget {
       onVisibilityToggle?.call(show);
     }
 
-    return show != oldWidget.show;
+    return show != oldWidget.show || showProgress != oldWidget.showProgress;
   }
 }

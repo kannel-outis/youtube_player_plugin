@@ -63,11 +63,11 @@ class _ToolBarWidgetState extends State<ToolBarWidget> {
                         ),
                       ),
                       const Expanded(child: SizedBox()),
-                      IconButton(
-                        onPressed: () {
+                      InkWell(
+                        onTap: () {
                           InheritedState.of(context).stateChange?.call(false);
                         },
-                        icon: Icon(
+                        child: Icon(
                           Icons.close_outlined,
                           size: Utils.blockWidth * 4 > 35
                               ? 35
