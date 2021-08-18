@@ -27,18 +27,20 @@ class _Testingpage2State extends State<Testingpage2> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // appBar: AppBar(),
-      body: Column(
-        children: [
-          YoutubePlayer(
-            controller: _controller,
-            // size: const Size(20, 20),
-            onVideoQualityChange: (quality) {
-              log(quality.qualityToString);
-            },
-          ),
-        ],
+    return SafeArea(
+      child: Scaffold(
+        // appBar: AppBar(),
+        body: Column(
+          children: [
+            YoutubePlayer(
+              controller: _controller,
+              // size: const Size(20, 20),
+              onVideoQualityChange: (quality) {
+                log(quality.qualityToString);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -32,6 +32,10 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
+    if (widget.controller.value.youtubePlayerStatus ==
+        YoutubePlayerStatus.playing) {
+      _anime.forward();
+    }
   }
 
   @override
