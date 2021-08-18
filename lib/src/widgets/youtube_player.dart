@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:youtube_player/src/utils/extensions.dart';
+import 'package:flutter/services.dart';
 import 'package:youtube_player/src/utils/typedef.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/src/widgets/inherited_state.dart';
@@ -137,88 +135,99 @@ class _YoutubePlayerState extends State<YoutubePlayer>
       },
       child: Stack(
         children: [
-          SizedAspectRatioWidget(
-            aspectRatio: widget.controller.value.aspectRatio,
-            additionalSize: widget.size != null
-                ? Size(widget.size!.width + 0, widget.size!.height + 30)
-                : const Size(0, 30),
-            child: Container(
-              width: double.infinity,
-              color: Colors.black,
-              child: Player(widget.controller),
-            ),
-          ),
-          AnimatedOpacity(
-            duration: _duration,
-            opacity: _animeController.value,
+          //
+          _FullScreenOrientation(
             child: SizedAspectRatioWidget(
-              aspectRatio: widget.controller.value.aspectRatio,
+              aspectRatio: 16 / 9,
               additionalSize: widget.size != null
-                  ? Size(widget.size!.width + 0, widget.size!.height + 30)
-                  : const Size(0, 30),
+                  ? Size(widget.size!.width, widget.size!.height)
+                  : const Size(0, 0),
               child: Container(
                 width: double.infinity,
-                color: Colors.black.withOpacity(.3),
+                alignment: Alignment.center,
+                color: Colors.black,
+                child: AspectRatio(
+                  aspectRatio: widget.controller.value.aspectRatio,
+                  child: Player(widget.controller),
+                ),
               ),
             ),
           ),
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onDoubleTap: () {
-              show = false;
-              _ticker?.cancel();
-              _ticker = null;
-              setState(() {});
-              print("double Tap");
-            },
-            onTap: () {
-              setState(() {
-                if (show) {
-                  show = false;
-                  _ticker?.cancel();
-                  _ticker = null;
-                } else {
-                  show = true;
-                  setShowToFalseAfterTimer(10);
-                }
-              });
-            },
-            child: SizedAspectRatioWidget(
-              additionalSize: widget.size != null
-                  ? Size(widget.size!.width + 0, widget.size!.height + 36)
-                  : const Size(0, 36),
-              aspectRatio: widget.controller.value.aspectRatio,
-              child: SizedBox(
-                width: double.infinity,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // tool bar
-                    widget._toolBarControl ??
-                        ToolBarWidget(
-                          controller: widget.controller,
-                          colors: widget.colors,
-                        ),
-
-                    // control sec
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: widget._controls ??
-                          ControlBarwidget(
+          _FullScreenOrientation(
+            child: AnimatedOpacity(
+              duration: _duration,
+              opacity: _animeController.value,
+              child: SizedAspectRatioWidget(
+                aspectRatio: widget.controller.value.aspectRatio,
+                additionalSize: widget.size != null
+                    ? Size(widget.size!.width, widget.size!.height)
+                    : const Size(0, 0),
+                child: Container(
+                  width: double.infinity,
+                  color: Colors.black.withOpacity(.3),
+                ),
+              ),
+            ),
+          ),
+          _FullScreenOrientation(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onDoubleTap: () {
+                show = false;
+                _ticker?.cancel();
+                _ticker = null;
+                setState(() {});
+                print("double Tap");
+              },
+              onTap: () {
+                setState(() {
+                  if (show) {
+                    show = false;
+                    _ticker?.cancel();
+                    _ticker = null;
+                  } else {
+                    show = true;
+                    setShowToFalseAfterTimer(10);
+                  }
+                });
+              },
+              child: SizedAspectRatioWidget(
+                additionalSize: widget.size != null
+                    ? Size(widget.size!.width, widget.size!.height + 6)
+                    : const Size(0, 6),
+                aspectRatio: widget.controller.value.aspectRatio,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // tool bar
+                      widget._toolBarControl ??
+                          ToolBarWidget(
                             controller: widget.controller,
                             colors: widget.colors,
                           ),
-                    ),
 
-                    // bottom buffer, progress, thumb and shit
-                    widget._progress ??
-                        ProgressSecWidget(
-                          // show: show,
-                          animeController: _animeController,
-                          controller: widget.controller,
-                          colors: widget.colors,
-                        ),
-                  ],
+                      // control sec
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: widget._controls ??
+                            ControlBarwidget(
+                              controller: widget.controller,
+                              colors: widget.colors,
+                            ),
+                      ),
+
+                      // bottom buffer, progress, thumb and shit
+                      widget._progress ??
+                          ProgressSecWidget(
+                            // show: show,
+                            animeController: _animeController,
+                            controller: widget.controller,
+                            colors: widget.colors,
+                          ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -226,5 +235,28 @@ class _YoutubePlayerState extends State<YoutubePlayer>
         ],
       ),
     );
+  }
+}
+
+class _FullScreenOrientation extends StatelessWidget {
+  // ignore: prefer_const_constructors_in_immutables
+  _FullScreenOrientation({Key? key, required Widget child})
+      : _child = child,
+        super(key: key);
+  late final Widget _child;
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.of(context).orientation == Orientation.portrait) {
+      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+
+      return _child;
+    } else {
+      SystemChrome.setEnabledSystemUIOverlays([]);
+      return SizedBox(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: _child,
+      );
+    }
   }
 }

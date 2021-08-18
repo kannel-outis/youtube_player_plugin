@@ -14,7 +14,7 @@ class _Testingpage2State extends State<Testingpage2> {
   late final YoutubePlayerController _controller;
   String quality = "240p";
   static const String youtubeLink =
-      "https://www.youtube.com/watch?v=X3Ai6osw3Mk";
+      "https://www.youtube.com/watch?v=BS3HgiHPYcs";
   @override
   void initState() {
     super.initState();
@@ -27,23 +27,18 @@ class _Testingpage2State extends State<Testingpage2> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        // appBar: AppBar(),
-        body: Column(
-          children: [
-            YoutubePlayer(
-              controller: _controller,
-              // size: const Size(20, 20),
-              onVideoQualityChange: (quality) {
-                log(quality.qualityToString);
-              },
-            ),
-            const SizedBox(
-              height: 200,
-            ),
-          ],
-        ),
+    return Scaffold(
+      // appBar: AppBar(),
+      body: Column(
+        children: [
+          YoutubePlayer(
+            controller: _controller,
+            // size: const Size(20, 20),
+            onVideoQualityChange: (quality) {
+              log(quality.qualityToString);
+            },
+          ),
+        ],
       ),
     );
   }

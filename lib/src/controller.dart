@@ -33,7 +33,8 @@ class _YoutubeControllerValue extends Equatable {
     if (size != null) {
       return size!.width / size!.height;
     } else {
-      return 16 / 7.4;
+      // return 16 / 7.4;
+      return 16 / 9;
     }
   }
 
