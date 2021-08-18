@@ -15,7 +15,7 @@ class YoutubePlayerMethodCall {
 
   static Future<int> initSurface() async {
     final textureId = await _channel.invokeMethod("initSurface");
-    print("${textureId.toString()}:::::::::::::::");
+    // print("${textureId.toString()}:::::::::::::::");
     return textureId as int;
   }
 

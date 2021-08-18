@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:youtube_player/src/utils/typedef.dart';
-import 'package:youtube_player/src/utils/utils.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/src/widgets/inherited_state.dart';
 import 'package:youtube_player/youtube_player.dart';
@@ -196,7 +195,6 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                 _ticker = null;
                 _showProgress(context);
                 setState(() {});
-                print("double Tap");
               },
               onTap: () {
                 setState(() {

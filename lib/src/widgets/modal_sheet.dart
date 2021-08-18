@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player/src/utils/scroll_config.dart';
 import 'package:youtube_player/src/utils/utils.dart';
 import 'package:youtube_player/youtube_player.dart';
 
@@ -38,7 +39,6 @@ class _ModalSheetState extends State<ModalSheet>
 
   @override
   Widget build(BuildContext context) {
-    print(_listOfQualities);
     final plusHeight = Utils.blockHeight > 550 ? 250 : 150;
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -77,71 +77,74 @@ class _ModalSheetState extends State<ModalSheet>
                 bottom: Utils.blockWidth * 5,
                 top: Utils.blockWidth * 5),
 
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      _controller.reverse();
-                      _pageController.animateToPage(0,
-                          duration: const Duration(milliseconds: 200),
-                          curve: Curves.easeInOut);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 25),
-                      child: SizedBox(
-                        height: Utils.blockHeight * 3,
-                        width: double.infinity,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Icon(
-                            Icons.arrow_back,
-                            size: Utils.blockWidth * 4,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  ..._listOfQualities.map(
-                    (e) => InkWell(
+            child: ScrollConfiguration(
+              behavior: NoEffectScrollConfig(),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
                       onTap: () {
-                        if (widget.controller != null) {
-                          widget.controller!.videoQualityChange(
-                            youtubeLink: widget.controller!.youtubeLink,
-                            quality: e,
-                          );
-                        }
-                        Navigator.pop(context);
+                        _controller.reverse();
+                        _pageController.animateToPage(0,
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeInOut);
                       },
-                      child: SizedBox(
-                        height: Utils.blockHeight * 15 / 3,
-                        width: double.infinity,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: 50,
-                                child: e == widget.controller!.value.quality
-                                    ? Icon(
-                                        Icons.done,
-                                        size: Utils.blockWidth * 4,
-                                      )
-                                    : const SizedBox(),
-                              ),
-                              Text(
-                                e.qualityToString,
-                                style:
-                                    TextStyle(fontSize: Utils.blockWidth * 3),
-                              ),
-                            ],
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 25),
+                        child: SizedBox(
+                          height: Utils.blockHeight * 3,
+                          width: double.infinity,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Icon(
+                              Icons.arrow_back,
+                              size: Utils.blockWidth * 4,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    ..._listOfQualities.map(
+                      (e) => InkWell(
+                        onTap: () {
+                          if (widget.controller != null) {
+                            widget.controller!.videoQualityChange(
+                              youtubeLink: widget.controller!.youtubeLink,
+                              quality: e,
+                            );
+                          }
+                          Navigator.pop(context);
+                        },
+                        child: SizedBox(
+                          height: Utils.blockHeight * 15 / 3,
+                          width: double.infinity,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  child: e == widget.controller!.value.quality
+                                      ? Icon(
+                                          Icons.done,
+                                          size: Utils.blockWidth * 4,
+                                        )
+                                      : const SizedBox(),
+                                ),
+                                Text(
+                                  e.qualityToString,
+                                  style:
+                                      TextStyle(fontSize: Utils.blockWidth * 3),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           )
