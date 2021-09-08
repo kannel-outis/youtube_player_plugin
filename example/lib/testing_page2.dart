@@ -19,7 +19,7 @@ class _Testingpage2State extends State<Testingpage2> {
   void initState() {
     super.initState();
     _controller = YoutubePlayerController.link(
-        youtubeLink: youtubeLink,
+        youtubeLink: "https://www.youtube.com/watch?v=X3Ai6osw3Mk",
         quality: YoutubePlayerVideoQuality.quality_144p);
     // https://www.youtube.com/watch?v=X3Ai6osw3Mk
     // https://www.youtube.com/watch?v=r64_50ELf58

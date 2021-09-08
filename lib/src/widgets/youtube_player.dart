@@ -174,7 +174,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
               duration: _duration,
               opacity: _animeController.value,
               child: SizedAspectRatioWidget(
-                aspectRatio: widget.controller.value.aspectRatio,
+                aspectRatio: 16 / 9,
                 additionalSize: widget.size != null
                     ? Size(widget.size!.width, widget.size!.height)
                     : const Size(0, 0),
@@ -214,7 +214,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                 additionalSize: widget.size != null
                     ? Size(widget.size!.width, widget.size!.height + 6)
                     : const Size(0, 6),
-                aspectRatio: widget.controller.value.aspectRatio,
+                aspectRatio: 16 / 9,
                 child: SizedBox(
                   width: double.infinity,
                   child: Column(
