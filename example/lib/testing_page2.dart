@@ -30,7 +30,7 @@ class _Testingpage2State extends State<Testingpage2> {
     return SafeArea(
       child: Scaffold(
         // appBar: AppBar(),
-        body: Column(
+        body: ListView(
           children: [
             YoutubePlayer(
               controller: _controller,

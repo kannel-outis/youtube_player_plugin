@@ -2,11 +2,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:youtube_player/src/utils/typedef.dart';
+import 'package:youtube_player/src/utils/utils.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/src/widgets/inherited_state.dart';
 import 'package:youtube_player/youtube_player.dart';
 import 'controls/control_bar_widget.dart';
 import 'controls/progress_bar_widget.dart';
+import 'time_toggle_widget.dart';
 import 'controls/tool_bar_widget.dart';
 import 'sized_aspect_ratio_widget.dart';
 
@@ -18,6 +20,8 @@ class YoutubePlayer extends StatefulWidget {
   final Size? size;
   final OnVisibilityChange? onVisibilityChange;
   final OnVideoQualityChange? onVideoQualityChange;
+  final bool completelyHideProgressBar;
+  final Widget? timeStampAndToggleWidget;
 
   YoutubePlayer({
     Key? key,
@@ -25,6 +29,8 @@ class YoutubePlayer extends StatefulWidget {
     this.onVisibilityChange,
     this.onVideoQualityChange,
     this.size,
+    this.timeStampAndToggleWidget,
+    this.completelyHideProgressBar = false,
     YoutubePlayerColors colors = const YoutubePlayerColors.auto(),
   })  : _colors = colors,
         super(key: key);
@@ -34,7 +40,9 @@ class YoutubePlayer extends StatefulWidget {
     required Widget toolBarControl,
     required Widget controls,
     required Widget progress,
+    this.completelyHideProgressBar = false,
     this.size,
+    this.timeStampAndToggleWidget,
     this.onVisibilityChange,
     this.onVideoQualityChange,
   })  : _toolBarControl = toolBarControl,
@@ -60,7 +68,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   bool showProgress = true;
   YoutubePlayerVideoQuality quality = YoutubePlayerVideoQuality.auto;
   Timer? _ticker;
-  bool show = true;
+  // bool show = true;
   @override
   void initState() {
     super.initState();
@@ -76,10 +84,10 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   }
 
   void setShowToFalseAfterTimer(int time) {
-    if (show) {
+    if (widget.controller.controlVisible) {
       _ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (timer.tick == time) {
-          show = false;
+          widget.controller.showControl = false;
           setState(() {});
           _ticker?.cancel();
         }
@@ -101,8 +109,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
         YoutubePlayerStatus.ended) {
       listenerCount++;
       if (listenerCount == 1) {
-        show = true;
-        setState(() {});
+        widget.controller.showControl = true;
       }
     }
   }
@@ -111,11 +118,15 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   void didUpdateWidget(covariant YoutubePlayer oldWidget) {
     // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.completelyHideProgressBar !=
+        widget.completelyHideProgressBar) {
+      setState(() {});
+    }
   }
 
   void _showProgress(BuildContext context) {
     if (MediaQuery.of(context).orientation == Orientation.landscape) {
-      if (show == true) {
+      if (widget.controller.controlVisible == true) {
         showProgress = true;
       } else {
         showProgress = false;
@@ -135,17 +146,18 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 
   @override
   Widget build(BuildContext context) {
+    widget.controller.showControl = true;
     _showProgress(context);
     return InheritedState(
-      show: show,
+      show: widget.controller.controlVisible,
       showProgress: showProgress,
       controller: widget.controller,
       onVisibilityToggle: (newShowState) {
-        show = newShowState;
-        widget.onVisibilityChange?.call(show);
+        widget.controller.showControl = newShowState;
+        widget.onVisibilityChange?.call(widget.controller.controlVisible);
       },
       stateChange: (b) {
-        show = b;
+        widget.controller.showControl = b;
         _showProgress(context);
         setState(() {});
       },
@@ -161,7 +173,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
               child: Container(
                 width: double.infinity,
                 alignment: Alignment.center,
-                color: Colors.black,
+                color: Colors.red,
                 child: AspectRatio(
                   aspectRatio: widget.controller.value.aspectRatio,
                   child: Player(widget.controller),
@@ -187,68 +199,87 @@ class _YoutubePlayerState extends State<YoutubePlayer>
           ),
           _FullScreenOrientation(
             height: MediaQuery.of(context).size.height - 25,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onDoubleTap: () {
-                show = false;
-                _ticker?.cancel();
-                _ticker = null;
-                _showProgress(context);
-                setState(() {});
-              },
-              onTap: () {
-                setState(() {
-                  if (show) {
-                    show = false;
+            // change
+            child: ListView(
+              children: [
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onDoubleTap: () {
+                    widget.controller.showControl = false;
                     _ticker?.cancel();
                     _ticker = null;
                     _showProgress(context);
-                  } else {
-                    show = true;
-                    setShowToFalseAfterTimer(10);
-                    _showProgress(context);
-                  }
-                });
-              },
-              child: SizedAspectRatioWidget(
-                additionalSize: widget.size != null
-                    ? Size(widget.size!.width, widget.size!.height + 6)
-                    : const Size(0, 6),
-                aspectRatio: 16 / 9,
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // tool bar
-                      widget._toolBarControl ??
-                          ToolBarWidget(
-                            controller: widget.controller,
-                            colors: widget.colors,
+                    setState(() {});
+                  },
+                  onTap: () {
+                    setState(() {
+                      if (widget.controller.controlVisible) {
+                        widget.controller.showControl = false;
+                        _ticker?.cancel();
+                        _ticker = null;
+                        _showProgress(context);
+                      } else {
+                        widget.controller.showControl = true;
+                        setShowToFalseAfterTimer(10);
+                        _showProgress(context);
+                      }
+                    });
+                  },
+                  child: SizedAspectRatioWidget(
+                    additionalSize: widget.size != null
+                        ? Size(widget.size!.width, widget.size!.height - 8.5)
+                        // 8.5 for potrait , 85.5 for landscape
+                        : const Size(0, -8.5),
+                    aspectRatio: 16 / 9,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // tool bar
+                          widget._toolBarControl ??
+                              ToolBarWidget(
+                                controller: widget.controller,
+                                colors: widget.colors,
+                              ),
+
+                          // control sec
+                          Container(
+                            // margin: const EdgeInsets.only(bottom: 20),
+                            child: widget._controls ??
+                                ControlBarwidget(
+                                  controller: widget.controller,
+                                  colors: widget.colors,
+                                ),
                           ),
 
-                      // control sec
-                      Container(
-                        // margin: const EdgeInsets.only(bottom: 20),
-                        child: widget._controls ??
-                            ControlBarwidget(
-                              controller: widget.controller,
-                              colors: widget.colors,
-                            ),
+                          // bottom buffer, progress, thumb and shit
+
+                          widget.timeStampAndToggleWidget ??
+                              TimeStampAndFullScreenToggleWidget(
+                                // show: show,
+                                animeController: _animeController,
+                                controller: widget.controller,
+                                colors: widget.colors,
+                              ),
+                          // SizedBox(
+                          //   height: 15 + (Utils.blockWidth * 1.3) + 50,
+                          // ),
+                        ],
                       ),
-
-                      // bottom buffer, progress, thumb and shit
-                      widget._progress ??
-                          ProgressSecWidget(
-                            // show: show,
-                            animeController: _animeController,
-                            controller: widget.controller,
-                            colors: widget.colors,
-                          ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+                if (!widget.completelyHideProgressBar || !showProgress)
+                  widget._progress ??
+                      ProgressSliderWidget(
+                        animeController: _animeController,
+                        colors: widget._colors,
+                        controller: widget.controller,
+                      )
+                else
+                  const SizedBox(),
+              ],
             ),
           ),
         ],

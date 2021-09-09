@@ -9,6 +9,7 @@ import 'utils/enums.dart';
 import 'utils/extensions.dart';
 import 'utils/life_cycle.dart';
 
+//ignore_for_file: use_late_for_private_fields_and_variables, avoid_init_to_null, cancel_subscriptions
 class _YoutubeControllerValue extends Equatable {
   final Duration position;
   final Size? size;
@@ -100,18 +101,22 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
   late final String _videoLink;
   late final String _quality;
 
-  // ignore: cancel_subscriptions, use_late_for_private_fields_and_variables
   StreamSubscription<Map<String, dynamic>>? _eventSubscription;
 
-  // ignore: use_late_for_private_fields_and_variables, avoid_init_to_null
   Timer? _timer = null;
   Timer? _bTimer;
 
-  // ignore: use_late_for_private_fields_and_variables
   YoutubePlayerAppLifeCycleObserver? _appLifeCycleObserver;
 
-  // ignore: use_late_for_private_fields_and_variables
   Completer? _readyToPlayInit;
+
+  bool _showController = false;
+
+  bool get controlVisible => _showController;
+
+  set showControl(bool toggle) {
+    _showController = toggle;
+  }
 
   Future<void> initController() async {
     _appLifeCycleObserver = YoutubePlayerAppLifeCycleObserver(this)
