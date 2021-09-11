@@ -114,6 +114,9 @@ class _YoutubePlayerState extends State<YoutubePlayer>
     }
   }
 
+  bool isPotrait(BuildContext context) =>
+      MediaQuery.of(context).orientation == Orientation.portrait;
+
   @override
   void didUpdateWidget(covariant YoutubePlayer oldWidget) {
     // TODO: implement didUpdateWidget
@@ -125,7 +128,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   }
 
   void _showProgress(BuildContext context) {
-    if (MediaQuery.of(context).orientation == Orientation.landscape) {
+    if (!isPotrait(context)) {
       if (widget.controller.controlVisible == true) {
         showProgress = true;
       } else {
@@ -146,7 +149,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 
   @override
   Widget build(BuildContext context) {
-    widget.controller.showControl = true;
+    // widget.controller.showControl = true;
     _showProgress(context);
     return InheritedState(
       show: widget.controller.controlVisible,
@@ -173,7 +176,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
               child: Container(
                 width: double.infinity,
                 alignment: Alignment.center,
-                color: Colors.red,
+                color: Colors.black,
                 child: AspectRatio(
                   aspectRatio: widget.controller.value.aspectRatio,
                   child: Player(widget.controller),
@@ -198,9 +201,8 @@ class _YoutubePlayerState extends State<YoutubePlayer>
             ),
           ),
           _FullScreenOrientation(
-            height: MediaQuery.of(context).size.height - 25,
             // change
-            child: ListView(
+            child: Column(
               children: [
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
@@ -230,7 +232,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                         ? Size(widget.size!.width, widget.size!.height - 8.5)
                         // 8.5 for potrait , 85.5 for landscape
                         : const Size(0, -8.5),
-                    aspectRatio: 16 / 9,
+                    aspectRatio: isPotrait(context) ? 16 / 9 : 16 / 7,
                     child: SizedBox(
                       width: double.infinity,
                       child: Column(
@@ -262,15 +264,12 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                                 controller: widget.controller,
                                 colors: widget.colors,
                               ),
-                          // SizedBox(
-                          //   height: 15 + (Utils.blockWidth * 1.3) + 50,
-                          // ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                if (!widget.completelyHideProgressBar || !showProgress)
+                if (widget.completelyHideProgressBar || showProgress)
                   widget._progress ??
                       ProgressSliderWidget(
                         animeController: _animeController,

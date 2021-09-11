@@ -25,7 +25,7 @@ class ProgressSliderWidget extends StatelessWidget {
       height: 15,
       child: ProgressSlider(
         // 15.0
-        thumbSize: (Utils.blockHeight * 1.2) * animeController!.value,
+        thumbSize: Utils.blockHeight * animeController!.value,
         // thumbSize: 15.0 *  animeController!.value,
         value: controller.value.duration != const Duration()
             ? controller.value.position.inMilliseconds /

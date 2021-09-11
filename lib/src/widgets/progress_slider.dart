@@ -176,7 +176,7 @@ class RenderProgressSlider extends RenderBox {
     //Progressbar
     final barPaint = Paint()
       ..color = _barcolor
-      ..strokeWidth = 2.5;
+      ..strokeWidth = 1.8;
     final point1 = Offset(0, size.height / 2);
     final point2 = Offset(size.width, size.height / 2);
     canvas.drawLine(point1, point2, barPaint);
@@ -184,7 +184,7 @@ class RenderProgressSlider extends RenderBox {
     // notBuffered progress Bar
     final notBufferedPaint = Paint()
       ..color = _barcolor
-      ..strokeWidth = 2.5;
+      ..strokeWidth = 1.8;
     final np1 = Offset(
       _currentValue > _bufferedValue
           ? _show * size.width
@@ -198,7 +198,7 @@ class RenderProgressSlider extends RenderBox {
     final s = Paint()
       // ..color = Colors.blue.withOpacity(.4)
       ..color = _bufferedcolor
-      ..strokeWidth = 2.5;
+      ..strokeWidth = 1.8;
     final s1 = Offset(0, size.height / 2);
     final s2 =
         Offset(_bufferedValue.clamp(0.0, 1.0) * size.width, size.height / 2);
@@ -207,7 +207,7 @@ class RenderProgressSlider extends RenderBox {
 //Progress
     final p = Paint()
       ..color = _progressBarcolor
-      ..strokeWidth = 3.0;
+      ..strokeWidth = 2.3;
     final p1 = Offset(0, size.height / 2);
     final p2 = Offset(_show.clamp(0.0, 1.0) * size.width, size.height / 2);
     canvas.drawLine(p1, p2, p);
