@@ -97,7 +97,10 @@ class TimeStampAndFullScreenToggleWidget extends StatelessWidget {
                           }
                         },
                         icon: Icon(
-                          Icons.fullscreen,
+                          MediaQuery.of(context).orientation ==
+                                  Orientation.portrait
+                              ? Icons.fullscreen
+                              : Icons.fullscreen_exit,
                           size: Utils.blockWidth * 3.5 > 30
                               ? 30
                               : Utils.blockWidth * 3.5,
@@ -108,11 +111,7 @@ class TimeStampAndFullScreenToggleWidget extends StatelessWidget {
                   )
                 : const SizedBox(),
           ),
-          SizedBox(height: Utils.blockWidth * 1.3),
-          // if (showProgress)
-          //   ProgressSliderWidget(animeController: animeController, controller: controller, colors: colors)
-          // else
-          //   const SizedBox(),
+          // SizedBox(height: Utils.blockWidth * 1.3),
         ],
       ),
     );
