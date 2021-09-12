@@ -76,9 +76,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   void initState() {
     super.initState();
     quality = widget.controller.value.quality;
-    widget.controller
-      ..addListener(_listener)
-      ..initController();
+    widget.controller.addListener(_listener);
     _animeController = AnimationController(
       vsync: this,
       duration: _duration,
@@ -147,7 +145,6 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   void dispose() {
     _ticker?.cancel();
     _ticker = null;
-    widget.controller.dispose();
     super.dispose();
   }
 

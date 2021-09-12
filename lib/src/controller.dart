@@ -118,7 +118,7 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
     _showController = toggle;
   }
 
-  Future<void> initController() async {
+  Future<void> initPlayer() async {
     _appLifeCycleObserver = YoutubePlayerAppLifeCycleObserver(this)
       ..initialize();
     _textureId = await YoutubePlayerMethodCall.initSurface();
