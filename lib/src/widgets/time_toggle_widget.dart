@@ -44,75 +44,85 @@ class TimeStampAndFullScreenToggleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final show = InheritedState.of(context).show;
     _animateProgress(show);
-    return SizedBox(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: show
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(children: [
-                        Text(
-                          "${_timerStringRep(controller.value.position.toString())} /",
-                          style: TextStyle(
-                            fontSize: Utils.blockWidth * 2.5 > 25
-                                ? 25
-                                : Utils.blockWidth * 2.5,
-                            color: Colors.white.withOpacity(.8),
+    return Expanded(
+      child: SizedBox(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (show)
+              Expanded(
+                child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: Utils.blockWidth * 3),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Row(children: [
+                          Text(
+                            "${_timerStringRep(controller.value.position.toString())} /",
+                            style: TextStyle(
+                              fontSize: Utils.blockWidth * 2.5 > 25
+                                  ? 25
+                                  : Utils.blockWidth * 2.5,
+                              color: Colors.white.withOpacity(.8),
+                            ),
                           ),
-                        ),
-                        Text(
-                          " ${_timerStringRep(controller.value.duration.toString())}",
-                          style: TextStyle(
-                            fontSize: Utils.blockWidth * 2.5 > 25
-                                ? 25
-                                : Utils.blockWidth * 2.5,
-                            color: Colors.white.withOpacity(.5),
-                          ),
-                        )
-                      ]),
-                      IconButton(
-                        onPressed: () {
-                          if (MediaQuery.of(context).orientation ==
-                              Orientation.portrait) {
-                            SystemChrome.setEnabledSystemUIOverlays([]);
-                            SystemChrome.setPreferredOrientations([
-                              DeviceOrientation.landscapeLeft,
-                              DeviceOrientation.landscapeRight,
-                            ]);
-                          } else {
-                            SystemChrome.setEnabledSystemUIOverlays(
-                                SystemUiOverlay.values);
-                            SystemChrome.setPreferredOrientations(
-                              const [
-                                DeviceOrientation.portraitUp,
-                                DeviceOrientation.portraitDown,
+                          Text(
+                            " ${_timerStringRep(controller.value.duration.toString())}",
+                            style: TextStyle(
+                              fontSize: Utils.blockWidth * 2.5 > 25
+                                  ? 25
+                                  : Utils.blockWidth * 2.5,
+                              color: Colors.white.withOpacity(.5),
+                            ),
+                          )
+                        ]),
+                        InkWell(
+                          onTap: () {
+                            if (MediaQuery.of(context).orientation ==
+                                Orientation.portrait) {
+                              SystemChrome.setEnabledSystemUIOverlays([]);
+                              SystemChrome.setPreferredOrientations([
                                 DeviceOrientation.landscapeLeft,
                                 DeviceOrientation.landscapeRight,
-                              ],
-                            );
-                          }
-                        },
-                        icon: Icon(
-                          MediaQuery.of(context).orientation ==
-                                  Orientation.portrait
-                              ? Icons.fullscreen
-                              : Icons.fullscreen_exit,
-                          size: Utils.blockWidth * 3.5 > 30
-                              ? 30
-                              : Utils.blockWidth * 3.5,
-                        ),
-                        color: colors!.iconsColor!.withOpacity(.8),
-                      )
-                    ],
-                  )
-                : const SizedBox(),
-          ),
-          // SizedBox(height: Utils.blockWidth * 1.3),
-        ],
+                              ]);
+                            } else {
+                              SystemChrome.setEnabledSystemUIOverlays(
+                                  SystemUiOverlay.values);
+                              SystemChrome.setPreferredOrientations(
+                                const [
+                                  DeviceOrientation.portraitUp,
+                                  DeviceOrientation.portraitDown,
+                                  DeviceOrientation.landscapeLeft,
+                                  DeviceOrientation.landscapeRight,
+                                ],
+                              );
+                            }
+                          },
+                          child: Icon(
+                            MediaQuery.of(context).orientation ==
+                                    Orientation.portrait
+                                ? Icons.fullscreen
+                                : Icons.fullscreen_exit,
+                            size: Utils.blockWidth * 3.5 > 30
+                                ? 30
+                                : Utils.blockWidth * 3.5,
+                            color: colors!.iconsColor!.withOpacity(.8),
+                          ),
+                          // color: colors!.iconsColor!.withOpacity(.8),
+                        )
+                      ],
+                    )),
+              )
+            else
+              const SizedBox(
+                height: 36,
+              ),
+            // SizedBox(height: Utils.blockWidth * 1.3),
+          ],
+        ),
       ),
     );
   }

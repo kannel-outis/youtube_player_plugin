@@ -2,15 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:youtube_player/src/utils/typedef.dart';
-import 'package:youtube_player/src/utils/utils.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/src/widgets/inherited_state.dart';
 import 'package:youtube_player/youtube_player.dart';
 import 'controls/control_bar_widget.dart';
 import 'controls/progress_bar_widget.dart';
-import 'time_toggle_widget.dart';
 import 'controls/tool_bar_widget.dart';
 import 'sized_aspect_ratio_widget.dart';
+import 'time_toggle_widget.dart';
 
 const _duration = Duration(milliseconds: 100);
 
@@ -22,6 +21,8 @@ class YoutubePlayer extends StatefulWidget {
   final OnVideoQualityChange? onVideoQualityChange;
   final bool completelyHideProgressBar;
   final Widget? timeStampAndToggleWidget;
+  final bool hideProgressThumb;
+  final double loadingWidth;
 
   YoutubePlayer({
     Key? key,
@@ -29,8 +30,10 @@ class YoutubePlayer extends StatefulWidget {
     this.onVisibilityChange,
     this.onVideoQualityChange,
     this.size,
+    this.loadingWidth = 17,
     this.timeStampAndToggleWidget,
     this.completelyHideProgressBar = false,
+    this.hideProgressThumb = false,
     YoutubePlayerColors colors = const YoutubePlayerColors.auto(),
   })  : _colors = colors,
         super(key: key);
@@ -40,8 +43,10 @@ class YoutubePlayer extends StatefulWidget {
     required Widget toolBarControl,
     required Widget controls,
     required Widget progress,
+    this.hideProgressThumb = false,
     this.completelyHideProgressBar = false,
     this.size,
+    this.loadingWidth = 17,
     this.timeStampAndToggleWidget,
     this.onVisibilityChange,
     this.onVideoQualityChange,
@@ -120,7 +125,9 @@ class _YoutubePlayerState extends State<YoutubePlayer>
     // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
     if (oldWidget.completelyHideProgressBar !=
-        widget.completelyHideProgressBar) {
+            widget.completelyHideProgressBar ||
+        oldWidget.hideProgressThumb != widget.hideProgressThumb ||
+        widget.loadingWidth != oldWidget.loadingWidth) {
       setState(() {});
     }
   }
@@ -149,6 +156,8 @@ class _YoutubePlayerState extends State<YoutubePlayer>
     // widget.controller.showControl = true;
     _showProgress(context);
     return InheritedState(
+      loadingWidth: widget.loadingWidth,
+      hideProgressThumb: widget.hideProgressThumb,
       show: widget.controller.controlVisible,
       showProgress: showProgress,
       controller: widget.controller,
@@ -236,11 +245,13 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // tool bar
-                          widget._toolBarControl ??
-                              ToolBarWidget(
-                                controller: widget.controller,
-                                colors: widget.colors,
-                              ),
+                          Expanded(
+                            child: widget._toolBarControl ??
+                                ToolBarWidget(
+                                  controller: widget.controller,
+                                  colors: widget.colors,
+                                ),
+                          ),
 
                           // control sec
                           Container(
@@ -266,7 +277,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                     ),
                   ),
                 ),
-                if (widget.completelyHideProgressBar || showProgress)
+                if (!widget.completelyHideProgressBar || !showProgress)
                   widget._progress ??
                       ProgressSliderWidget(
                         animeController: _animeController,

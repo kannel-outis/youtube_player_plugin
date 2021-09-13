@@ -9,6 +9,8 @@ class InheritedState extends InheritedWidget {
   final YoutubePlayerController? controller;
   final OnVisibilityToggle? onVisibilityToggle;
   final Function(bool)? stateChange;
+  final bool hideProgressThumb;
+  final double loadingWidth;
 
   const InheritedState({
     this.onVisibilityToggle,
@@ -16,6 +18,8 @@ class InheritedState extends InheritedWidget {
     this.controller,
     this.stateChange,
     this.showProgress = true,
+    required this.loadingWidth,
+    required this.hideProgressThumb,
     required Widget child,
     Key? key,
   }) : super(child: child, key: key);
@@ -29,6 +33,9 @@ class InheritedState extends InheritedWidget {
       onVisibilityToggle?.call(show);
     }
 
-    return show != oldWidget.show || showProgress != oldWidget.showProgress;
+    return show != oldWidget.show ||
+        showProgress != oldWidget.showProgress ||
+        hideProgressThumb != oldWidget.hideProgressThumb ||
+        loadingWidth != oldWidget.loadingWidth;
   }
 }
