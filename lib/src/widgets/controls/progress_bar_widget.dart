@@ -20,9 +20,9 @@ class ProgressSliderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final showThumb = InheritedState.of(context).hideProgressThumb;
-
     return SizedBox(
-      height: Utils.blockHeight,
+      height: Utils.blockHeight < 15 ? 15 : Utils.blockHeight,
+      // height: 15,
       child: ProgressSlider(
         thumbSize: showThumb ? 0 : Utils.blockHeight * animeController!.value,
         value: controller.value.duration != const Duration()
