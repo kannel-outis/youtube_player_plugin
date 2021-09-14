@@ -52,6 +52,7 @@ class _PlayerState extends State<Player> {
     if (!widget.controller.isDisposed) {
       oldWidget.controller.removeListener(_listener);
       _textureId = widget.controller.textureId;
+      setS();
       widget.controller.addListener(_listener);
     }
   }

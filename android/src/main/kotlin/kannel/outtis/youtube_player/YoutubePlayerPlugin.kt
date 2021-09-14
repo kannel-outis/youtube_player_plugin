@@ -62,15 +62,12 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
               Log.d("dispose", "dispose called and all cleared")
           }
           "initPlayer" -> {
-//              var count:Int = 0
               val videoUrl:String? = call.argument<String>("video")
               val audioUrl:String? = call.argument<String>("audio")
               val youtubeLink:String? = call.argument<String>("youtubeLink")
               val quality:String? = call.argument<String>("quality")
               if(youtubeLink != null){
                   YtExtractorClassSingleTonObject.instance.extractFun(youtubeLink, context!!, quality!!){
-//                      count++
-//                      if(count == 1){
                           val links:MutableMap<String, Any?> = HashMap<String, Any?>()
                           links["audio"] = it.audioLink
                           links["video"] = it.videoLink
@@ -79,14 +76,15 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
                           val readyToPlay =  ExoPlayerIm.setUpPlayer(streamLinks = it, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
                           links["readyToPlay"] = readyToPlay
                           result.success(links)
-//                      }
 
                   }
               }else{
                   eventChannel = EventChannel(messenger, "youtube-player + $textureId")
                   val streamLinks = StreamLinks(audioLink= audioUrl,  videoLink = videoUrl, quality = quality!!);
                   val readyToPlay =  ExoPlayerIm.setUpPlayer(streamLinks = streamLinks, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
-                  result.success(readyToPlay);
+                  result.success(mutableMapOf<String, Any>(
+                      "readyToPlay" to readyToPlay
+                  ));
               }
 
 

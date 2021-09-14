@@ -101,6 +101,10 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
   late final String _videoLink;
   late final String _quality;
 
+  late final _PlayingFromLinks _playingFromLinks;
+
+  _PlayingFromLinks get playingFromLinks => _playingFromLinks;
+
   StreamSubscription<Map<String, dynamic>>? _eventSubscription;
 
   Timer? _timer = null;
@@ -118,21 +122,27 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
     _showController = toggle;
   }
 
-  Future<void> initController() async {
+  Future<void> initPlayer() async {
     _appLifeCycleObserver = YoutubePlayerAppLifeCycleObserver(this)
       ..initialize();
     _textureId = await YoutubePlayerMethodCall.initSurface();
     if (_youtubeLink != null) {
       await YoutubePlayerMethodCall.initPlayer(
               youtubeLink: _youtubeLink, quality: _quality)
-          .then((_) {
-        if (_ == true) {}
+          .then((response) {
+        _playingFromLinks = _PlayingFromLinks(
+          audioLink: response["audio"] as String,
+          videoLink: response["video"] as String,
+        );
+        notifyListeners();
       });
     } else {
       await YoutubePlayerMethodCall.initPlayer(
               audioLink: _audioLink, videoLink: _videoLink, quality: _quality)
           .then((_) {
-        if (_ == true) {}
+        _playingFromLinks =
+            _PlayingFromLinks(audioLink: _audioLink, videoLink: _videoLink);
+        notifyListeners();
       });
     }
 
@@ -166,7 +176,6 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
                 buffering: false);
             _timer?.cancel();
             _bTimer?.cancel();
-            // _bTimer?.cancel();
             break;
           case "state_idle":
             value = value.copywidth(
@@ -217,7 +226,6 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
       return;
     }
     final _position = await position();
-    // final _bPosition = await bufferedPosition;
     if (value.youtubePlayerStatus == YoutubePlayerStatus.ended) {
       _status = YoutubePlayerStatus.ended;
       _timer?.cancel();
@@ -225,7 +233,6 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
     value = value.copywidth(
       youtubePlayerStatus: _status,
       position: _position,
-      // bufferedPosition: _bPosition,
     );
   }
 
@@ -299,4 +306,11 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
     _isDisposed = true;
     super.dispose();
   }
+}
+
+class _PlayingFromLinks {
+  final String videoLink;
+  final String audioLink;
+
+  const _PlayingFromLinks({required this.audioLink, required this.videoLink});
 }

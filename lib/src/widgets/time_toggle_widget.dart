@@ -5,8 +5,6 @@ import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/src/widgets/inherited_state.dart';
 import 'package:youtube_player/youtube_player.dart';
 
-import 'progress_slider.dart';
-
 class TimeStampAndFullScreenToggleWidget extends StatelessWidget {
   final YoutubePlayerController controller;
   final AnimationController? animeController;

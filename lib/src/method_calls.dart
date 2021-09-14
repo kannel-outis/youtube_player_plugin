@@ -15,11 +15,10 @@ class YoutubePlayerMethodCall {
 
   static Future<int> initSurface() async {
     final textureId = await _channel.invokeMethod("initSurface");
-    // print("${textureId.toString()}:::::::::::::::");
     return textureId as int;
   }
 
-  static Future<bool> initPlayer(
+  static Future<Map<String, dynamic>> initPlayer(
       {String? audioLink,
       String? videoLink,
       String? youtubeLink,
@@ -33,7 +32,9 @@ class YoutubePlayerMethodCall {
         "quality": quality,
       },
     );
-    return readyToPlay["readyToPlay"] as bool;
+    return (readyToPlay as Map).map(
+      (key, value) => MapEntry(key as String, value),
+    );
   }
 
   static Future<void> dispose() async {
