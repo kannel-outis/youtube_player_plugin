@@ -16,13 +16,27 @@ class YoutubePlayerAppLifeCycleObserver extends WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.paused:
+        if (_controller.value.youtubePlayerStatus ==
+                YoutubePlayerStatus.notInitialized ||
+            _controller.value.youtubePlayerStatus ==
+                YoutubePlayerStatus.notInitialized) {
+          return;
+        }
         _wasPlayingBeforePause = _controller.value.youtubePlayerStatus ==
             YoutubePlayerStatus.playing;
-        _controller.pause();
+        if (_wasPlayingBeforePause) {
+          _controller.pause();
+        }
         break;
       case AppLifecycleState.resumed:
         if (_wasPlayingBeforePause) {
           _controller.play();
+        }
+        if (_controller.value.youtubePlayerStatus ==
+                YoutubePlayerStatus.notInitialized ||
+            _controller.value.youtubePlayerStatus ==
+                YoutubePlayerStatus.bufferring) {
+          return;
         }
         break;
       default:

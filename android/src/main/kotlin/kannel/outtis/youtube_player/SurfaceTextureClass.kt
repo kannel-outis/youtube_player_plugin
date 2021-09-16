@@ -28,10 +28,11 @@ class SurfaceTextureManagerClass( private val binding: FlutterPlugin.FlutterPlug
 
     fun dispose():Unit{
         if(surfaceEntry != null){
-            surfaceEntry!!.release()
-            surfaceEntry = null
+
             surfaceTexture!!.release()
             surfaceTexture = null
+            surfaceEntry!!.release()
+            surfaceEntry = null
 
         }
     }

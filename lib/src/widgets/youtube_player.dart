@@ -1,20 +1,56 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:youtube_player/src/utils/typedef.dart';
+import 'package:youtube_player/src/utils/youtube_player_colors.dart';
+import 'package:youtube_player/src/widgets/inherited_state.dart';
 import 'package:youtube_player/youtube_player.dart';
-import 'custom_slider.dart';
+import 'controls/control_bar_widget.dart';
+import 'controls/progress_bar_widget.dart';
+import 'controls/tool_bar_widget.dart';
+import 'sized_aspect_ratio_widget.dart';
+import 'time_toggle_widget.dart';
 
-const _duration = Duration(milliseconds: 300);
+const _duration = Duration(milliseconds: 100);
 
 // ignore_for_file: must_be_immutable, avoid_init_to_null
 class YoutubePlayer extends StatefulWidget {
   final YoutubePlayerController controller;
-  YoutubePlayer({Key? key, required this.controller}) : super(key: key);
+  final Size? size;
+  final OnVisibilityChange? onVisibilityChange;
+  final OnVideoQualityChange? onVideoQualityChange;
+  final bool completelyHideProgressBar;
+  final Widget? timeStampAndToggleWidget;
+  final bool hideProgressThumb;
+  final double loadingWidth;
+
+  YoutubePlayer({
+    Key? key,
+    required this.controller,
+    this.onVisibilityChange,
+    this.onVideoQualityChange,
+    this.size,
+    this.loadingWidth = 17,
+    this.timeStampAndToggleWidget,
+    this.completelyHideProgressBar = false,
+    this.hideProgressThumb = false,
+    YoutubePlayerColors colors = const YoutubePlayerColors.auto(),
+  })  : _colors = colors,
+        super(key: key);
   YoutubePlayer.withControls({
     Key? key,
     required this.controller,
-    required Widget toolBarControl,
-    required Widget controls,
-    required Widget progress,
-  })   : _toolBarControl = toolBarControl,
+    Widget? toolBarControl,
+    Widget? controls,
+    Widget? progress,
+    this.hideProgressThumb = false,
+    this.completelyHideProgressBar = false,
+    this.size,
+    this.loadingWidth = 17,
+    this.timeStampAndToggleWidget,
+    this.onVisibilityChange,
+    this.onVideoQualityChange,
+  })  : _toolBarControl = toolBarControl,
         _controls = controls,
         _progress = progress,
         super(key: key);
@@ -24,6 +60,8 @@ class YoutubePlayer extends StatefulWidget {
   Widget? get controls => _controls;
   late Widget? _progress = null;
   Widget? get progress => _progress;
+  late YoutubePlayerColors _colors;
+  YoutubePlayerColors get colors => _colors;
 
   @override
   _YoutubePlayerState createState() => _YoutubePlayerState();
@@ -32,415 +70,256 @@ class YoutubePlayer extends StatefulWidget {
 class _YoutubePlayerState extends State<YoutubePlayer>
     with SingleTickerProviderStateMixin {
   late AnimationController _animeController;
-  bool show = true;
+  bool showProgress = true;
+  YoutubePlayerVideoQuality quality = YoutubePlayerVideoQuality.auto;
+  Timer? _ticker;
+  // bool show = true;
   @override
   void initState() {
     super.initState();
+    quality = widget.controller.value.quality;
     widget.controller
-      ..addListener(_listener)
-      ..initController();
+      ..initPlayer()
+      ..addListener(_listener);
     _animeController = AnimationController(
       vsync: this,
       duration: _duration,
     )..addListener(_listener);
-
-    _animeController.forward();
+    setShowToFalseAfterTimer(12);
   }
+
+  void setShowToFalseAfterTimer(int time) {
+    if (widget.controller.controlVisible) {
+      _ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (timer.tick == time) {
+          widget.controller.showControl = false;
+          setState(() {});
+          _ticker?.cancel();
+        }
+      });
+    }
+  }
+
+  int listenerCount = 0;
 
   void _listener() {
     if (mounted) setState(() {});
+    if (quality != widget.controller.value.quality) {
+      quality = widget.controller.value.quality;
+      widget.onVideoQualityChange?.call(quality);
+    } else if (widget.controller.value.youtubePlayerStatus ==
+        YoutubePlayerStatus.playing) {
+      listenerCount = 0;
+    } else if (widget.controller.value.youtubePlayerStatus ==
+        YoutubePlayerStatus.ended) {
+      listenerCount++;
+      if (listenerCount == 1) {
+        widget.controller.showControl = true;
+      }
+    }
+  }
+
+  bool isPotrait(BuildContext context) =>
+      MediaQuery.of(context).orientation == Orientation.portrait;
+
+  @override
+  void didUpdateWidget(covariant YoutubePlayer oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.completelyHideProgressBar !=
+            widget.completelyHideProgressBar ||
+        oldWidget.hideProgressThumb != widget.hideProgressThumb ||
+        widget.loadingWidth != oldWidget.loadingWidth) {
+      setState(() {});
+    }
+  }
+
+  void _showProgress(BuildContext context) {
+    if (!isPotrait(context)) {
+      if (widget.controller.controlVisible == true) {
+        showProgress = true;
+      } else {
+        showProgress = false;
+      }
+    } else {
+      showProgress = true;
+    }
   }
 
   @override
-  void deactivate() {
+  void dispose() {
+    _ticker?.cancel();
+    _ticker = null;
     widget.controller.dispose();
-    super.deactivate();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          height: 350 - 8.5,
-          width: double.infinity,
-          color: Colors.black,
-          child: Player(widget.controller),
-        ),
-        AnimatedOpacity(
-          duration: _duration,
-          opacity: _animeController.value,
-          child: Container(
-            height: 350 - 8.5,
-            width: double.infinity,
-            color: Colors.black.withOpacity(.3),
-          ),
-        ),
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onDoubleTap: () {
-            show = false;
-            setState(() {});
-          },
-          onTap: () {
-            setState(() {
-              if (show) {
-                show = false;
-              } else {
-                show = true;
-              }
-            });
-          },
-          child: SizedBox(
-            height: 350,
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // tool bar
-                widget._toolBarControl ??
-                    ToolBarWidget(
-                      controller: widget.controller,
-                      show: show,
-                    ),
-
-                // control sec
-                widget._controls ??
-                    ControlBarwidget(
-                      controller: widget.controller,
-                      show: show,
-                    ),
-
-                // bottom buffer, progress, thumb and shit
-                widget._progress ??
-                    ProgressSecWidget(
-                      show: show,
-                      animeController: _animeController,
-                      controller: widget.controller,
-                    ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class ToolBarWidget extends StatefulWidget {
-  final bool show;
-  final YoutubePlayerController? controller;
-  const ToolBarWidget({Key? key, this.controller, this.show = false})
-      : super(key: key);
-
-  @override
-  _ToolBarWidgetState createState() => _ToolBarWidgetState();
-}
-
-class _ToolBarWidgetState extends State<ToolBarWidget> {
-  bool? _show;
-
-  @override
-  void initState() {
-    super.initState();
-    _show = widget.show;
-  }
-
-  @override
-  void didUpdateWidget(covariant ToolBarWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.show != widget.show) {
-      _show = widget.show;
-      setState(() => {});
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _show != null && _show!
-        ? Container(
-            height: 35,
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Icon(Icons.expand_more_outlined),
-                SizedBox(
-                  width: 70,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.more_vert),
-                      Expanded(child: SizedBox()),
-                      Icon(
-                        Icons.close,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          )
-        : const SizedBox(height: 35);
-  }
-}
-
-class ControlBarwidget extends StatefulWidget {
-  final YoutubePlayerController controller;
-  final bool show;
-
-  const ControlBarwidget(
-      {Key? key, required this.controller, this.show = false})
-      : super(key: key);
-
-  @override
-  _ControlBarwidgetState createState() => _ControlBarwidgetState();
-}
-
-class _ControlBarwidgetState extends State<ControlBarwidget>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _anime;
-  bool? _show;
-
-  bool? shouldPlay;
-  @override
-  void initState() {
-    super.initState();
-    _show = widget.show;
-    shouldPlay = widget.controller.value.youtubePlayerStatus ==
-        YoutubePlayerStatus.initialized;
-    setState(() => {});
-
-    _anime = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-  }
-
-  @override
-  void didUpdateWidget(covariant ControlBarwidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    shouldPlay = widget.controller.value.youtubePlayerStatus ==
-        YoutubePlayerStatus.paused;
-    setState(() => {});
-
-    if (oldWidget.show != widget.show) {
-      _show = widget.show;
-      setState(() => {});
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _show != null && _show!
-        ? SizedBox(
-            width: 320,
-            child: Center(
-              child: InkWell(
-                onTap: () {
-                  return;
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        widget.controller.seekTo(
-                          Duration(
-                            milliseconds: (widget.controller.value.position
-                                        .inMilliseconds -
-                                    const Duration(seconds: 10).inMilliseconds)
-                                .round(),
-                          ),
-                        );
-                      },
-                      child: const Center(
-                        child: SizedBox(
-                          height: 60,
-                          width: 60,
-                          child: Icon(Icons.replay_10_outlined, size: 40),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 70),
-                    InkWell(
-                      onTap: () {
-                        if (widget.controller.value.youtubePlayerStatus ==
-                                YoutubePlayerStatus.initialized ||
-                            widget.controller.value.youtubePlayerStatus ==
-                                YoutubePlayerStatus.paused) {
-                          print(shouldPlay);
-                          _anime.forward();
-                          widget.controller.play();
-                        } else if (widget
-                                .controller.value.youtubePlayerStatus ==
-                            YoutubePlayerStatus.playing) {
-                          _anime.reverse();
-                          widget.controller.pause();
-                        }
-                      },
-                      child: Center(
-                        child: SizedBox(
-                          height: 60,
-                          width: 60,
-                          child: AnimatedIcon(
-                            progress: _anime,
-                            icon: AnimatedIcons.play_pause,
-                            size: 50,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 70),
-                    InkWell(
-                      onTap: () {
-                        widget.controller.seekTo(
-                          Duration(
-                            milliseconds: (widget.controller.value.position
-                                        .inMilliseconds +
-                                    const Duration(seconds: 10).inMilliseconds)
-                                .round(),
-                          ),
-                        );
-                      },
-                      child: const Center(
-                        child: SizedBox(
-                          height: 60,
-                          width: 60,
-                          child: Icon(Icons.forward_10_outlined, size: 40),
-                        ),
-                      ),
-                    ),
-                  ],
+    // widget.controller.showControl = true;
+    _showProgress(context);
+    return InheritedState(
+      loadingWidth: widget.loadingWidth,
+      hideProgressThumb: widget.hideProgressThumb,
+      show: widget.controller.controlVisible,
+      showProgress: showProgress,
+      controller: widget.controller,
+      onVisibilityToggle: (newShowState) {
+        widget.controller.showControl = newShowState;
+        widget.onVisibilityChange?.call(widget.controller.controlVisible);
+      },
+      stateChange: (b) {
+        widget.controller.showControl = b;
+        _showProgress(context);
+        setState(() {});
+      },
+      child: Stack(
+        children: [
+          //
+          _FullScreenOrientation(
+            child: SizedAspectRatioWidget(
+              aspectRatio: 16 / 9,
+              additionalSize: widget.size != null
+                  ? Size(widget.size!.width, widget.size!.height)
+                  : const Size(0, 0),
+              child: Container(
+                width: double.infinity,
+                alignment: Alignment.center,
+                color: Colors.black,
+                child: AspectRatio(
+                  aspectRatio: widget.controller.value.aspectRatio,
+                  child: Player(widget.controller),
                 ),
               ),
             ),
-          )
-        : const SizedBox();
-  }
-}
-
-class ProgressSecWidget extends StatefulWidget {
-  final YoutubePlayerController controller;
-  final bool? show;
-  final AnimationController? animeController;
-
-  const ProgressSecWidget(
-      {Key? key, required this.controller, this.show, this.animeController})
-      : super(key: key);
-
-  @override
-  _ProgressSecWidgetState createState() => _ProgressSecWidgetState();
-}
-
-class _ProgressSecWidgetState extends State<ProgressSecWidget> {
-  @override
-  void initState() {
-    super.initState();
-    if (widget.show != null && widget.show! == true) {
-      widget.animeController!.forward();
-    } else if (widget.show == false) {
-      widget.animeController!.reverse();
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant ProgressSecWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.show! != widget.show) {
-      if (widget.show != null && widget.show! == true) {
-        widget.animeController!.forward();
-      } else if (widget.show == false) {
-        widget.animeController!.reverse();
-      }
-
-      // if (oldWidget.controller.value.duration !=
-      //     widget.controller.value.duration) {
-      //   setState(() {});
-      // }
-    }
-  }
-
-  String _timerStringRep(String time) {
-    if (time.isEmpty) return "00.00";
-    final s = time.split(".");
-    s.removeAt(s.length - 1);
-    final y = s.join().split(":");
-    if (int.tryParse(y.first) != null && int.tryParse(y.first)! > 0) {
-      return y.join(":");
-    } else {
-      y.removeAt(0);
-      return y.join(":");
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(children: [
-                  Text(
-                    "${_timerStringRep(widget.controller.value.position.toString())} /",
-                    style: const TextStyle(fontSize: 15),
-                  ),
-                  Text(
-                    " ${_timerStringRep(widget.controller.value.duration.toString())}",
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white.withOpacity(.5),
-                    ),
-                  )
-                ]),
-                Icon(
-                  Icons.fullscreen,
-                  size: 23,
-                  color: Colors.white.withOpacity(.8),
-                )
-              ],
+          ),
+          _FullScreenOrientation(
+            child: AnimatedOpacity(
+              duration: _duration,
+              opacity: _animeController.value,
+              child: SizedAspectRatioWidget(
+                aspectRatio: 16 / 9,
+                additionalSize: widget.size != null
+                    ? Size(widget.size!.width, widget.size!.height)
+                    : const Size(0, 0),
+                child: Container(
+                  width: double.infinity,
+                  color: Colors.black.withOpacity(.3),
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 15,
-            child: CustomSliderForPlayer(
-              // 15.0
-              thumbSize: 15.0 * widget.animeController!.value,
-              value: widget.controller.value.duration != const Duration()
-                  ? widget.controller.value.position.inMilliseconds /
-                      widget.controller.value.duration.inMilliseconds
-                  : 0.0,
-              bufferedValue: widget.controller.value.duration !=
-                      const Duration()
-                  ? widget.controller.value.bufferedPosition.inMilliseconds /
-                      widget.controller.value.duration.inMilliseconds
-                  : 0.0,
-              progressBarColor: Colors.red,
-              barColor: Colors.white.withOpacity(.25),
-              bufferedColor: Colors.white.withOpacity(.5),
-              thumbColor: Colors.red,
-              seekTo: (value) {
-                widget.controller.seekTo(
-                  Duration(
-                    milliseconds:
-                        (widget.controller.value.duration.inMilliseconds *
-                                value)
-                            .round(),
+          _FullScreenOrientation(
+            // change
+            child: Column(
+              children: [
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onDoubleTap: () {
+                    widget.controller.showControl = false;
+                    _ticker?.cancel();
+                    _ticker = null;
+                    _showProgress(context);
+                    setState(() {});
+                  },
+                  onTap: () {
+                    setState(() {
+                      if (widget.controller.controlVisible) {
+                        widget.controller.showControl = false;
+                        _ticker?.cancel();
+                        _ticker = null;
+                        _showProgress(context);
+                      } else {
+                        widget.controller.showControl = true;
+                        setShowToFalseAfterTimer(10);
+                        _showProgress(context);
+                      }
+                    });
+                  },
+                  child: SizedAspectRatioWidget(
+                    additionalSize: widget.size != null
+                        ? Size(widget.size!.width, widget.size!.height - 8.5)
+                        // 8.5 for potrait , 85.5 for landscape
+                        : const Size(0, -8.5),
+                    aspectRatio: isPotrait(context) ? 16 / 9 : 16 / 7,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // tool bar
+                          Expanded(
+                            child: widget._toolBarControl ??
+                                ToolBarWidget(
+                                  controller: widget.controller,
+                                  colors: widget.colors,
+                                ),
+                          ),
+
+                          // control sec
+                          Container(
+                            // margin: const EdgeInsets.only(bottom: 20),
+                            child: widget._controls ??
+                                ControlBarwidget(
+                                  controller: widget.controller,
+                                  colors: widget.colors,
+                                ),
+                          ),
+
+                          // bottom buffer, progress, thumb and shit
+
+                          widget.timeStampAndToggleWidget ??
+                              TimeStampAndFullScreenToggleWidget(
+                                // show: show,
+                                animeController: _animeController,
+                                controller: widget.controller,
+                                colors: widget.colors,
+                              ),
+                        ],
+                      ),
+                    ),
                   ),
-                );
-              },
+                ),
+                if (!widget.completelyHideProgressBar || !showProgress)
+                  widget._progress ??
+                      ProgressSliderWidget(
+                        animeController: _animeController,
+                        colors: widget._colors,
+                        controller: widget.controller,
+                      )
+                else
+                  const SizedBox(),
+              ],
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+class _FullScreenOrientation extends StatelessWidget {
+  final double? height;
+  final double? width;
+  // ignore: prefer_const_constructors_in_immutables
+  _FullScreenOrientation(
+      {Key? key, required Widget child, this.width, this.height})
+      : _child = child,
+        super(key: key);
+  late final Widget _child;
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.of(context).orientation == Orientation.portrait) {
+      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+
+      return _child;
+    } else {
+      SystemChrome.setEnabledSystemUIOverlays([]);
+      return SizedBox(
+        height: height ?? MediaQuery.of(context).size.height,
+        width: width ?? MediaQuery.of(context).size.width,
+        child: _child,
+      );
+    }
   }
 }

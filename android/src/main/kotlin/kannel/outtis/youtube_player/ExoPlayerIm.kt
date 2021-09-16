@@ -16,6 +16,9 @@ import com.google.android.exoplayer2.video.VideoSize
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel.Result
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.audio.AudioAttributes
+
 
 class ExoPlayerIm {
 
@@ -23,25 +26,36 @@ class ExoPlayerIm {
        private var exoplayer:SimpleExoPlayer? = null
         private val eventSink:EventSink = EventSink()
         private var readyToPlay:Boolean = false
+        private var quality:String? = null
 
         fun getExoPlayerInstance():SimpleExoPlayer{
             return exoplayer!!
         }
 
-         fun setUpPlayer(call: MethodCall, context:android.content.Context, surfaceManager:SurfaceTextureManagerClass, eventChannel: EventChannel): Boolean{
-            val videoUrl:String? = call.argument<String>("video")
-            val audioUrl:String? = call.argument<String>("audio")
+         fun setUpPlayer(streamLinks:StreamLinks, context:android.content.Context, surfaceManager:SurfaceTextureManagerClass, eventChannel: EventChannel): Boolean{
             exoplayer =  SimpleExoPlayer.Builder(context).build()
+             exoplayer!!.addListener(
+                     ListenerF()
+             )
             val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
-            val vUri = Uri.parse(videoUrl)
-            val aUri  = Uri.parse(audioUrl)
+            val vUri = Uri.parse(streamLinks.videoLink)
+            val aUri  = Uri.parse(streamLinks.audioLink)
             val vSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
                 MediaItem.fromUri(vUri))
             val aSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
                 MediaItem.fromUri(aUri))
             val mediaSource: MediaSource = MergingMediaSource(vSource, aSource)
-            exoplayer!!.prepare(mediaSource)
+            exoplayer!!.setMediaSource(mediaSource)
+             exoplayer!!.prepare()
              readyToPlay = true
+             val audioAttributes: AudioAttributes = AudioAttributes.Builder()
+                     .setUsage(C.USAGE_MEDIA)
+                     .setContentType(C.CONTENT_TYPE_MOVIE)
+                     .build()
+             exoplayer!!.setAudioAttributes(audioAttributes, true)
+             quality = streamLinks.quality
+
+
              eventChannel.setStreamHandler(
                object :  EventChannel.StreamHandler{
                    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
@@ -58,10 +72,25 @@ class ExoPlayerIm {
             val surface: Surface = Surface(surfaceManager.getSurfaceTexture())
             exoplayer!!.setVideoSurface(surface)
 //            exoplayer!!.playWhenReady = readyToPlay
-             exoplayer!!.addListener(
-                ListenerF()
-             )
+
              return readyToPlay;
+        }
+
+        fun onVideoQualityChange(streamLinks: StreamLinks):Unit{
+            if(exoplayer != null){
+                var position:Long = exoplayer!!.currentPosition
+                val vUri = Uri.parse(streamLinks.videoLink)
+                val aUri  = Uri.parse(streamLinks.audioLink)
+                val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
+                val vSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
+                        MediaItem.fromUri(vUri))
+                val aSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
+                        MediaItem.fromUri(aUri))
+                val mediaSource: MediaSource = MergingMediaSource(vSource, aSource)
+                exoplayer!!.setMediaSource(mediaSource)
+                exoplayer!!.seekTo(position)
+                quality = streamLinks.quality
+            }
         }
 
         fun dispose():Unit{
@@ -77,17 +106,23 @@ class ExoPlayerIm {
             when(call.method){
                 "play"->{
                     if(exoplayer != null){
-                        exoplayer!!.play()
-                        status["status"] = "playing"
-                        result.success(status)
+                        if(!exoplayer!!.isPlaying){
+                            exoplayer!!.play()
+                            status["status"] = "playing"
+                            result.success(status)
+                        }
+
                     }
 
                 }
                 "pause"->{
                     if(exoplayer != null){
-                        exoplayer!!.pause()
-                        status["status"] = "paused"
-                        result.success(status)
+                        if (exoplayer!!.isPlaying) {
+                            exoplayer!!.pause()
+                            status["status"] = "paused"
+                            result.success(status)
+                        }
+
                     }
 
                 }
@@ -124,13 +159,16 @@ class ExoPlayerIm {
 
 
             override fun onPlaybackStateChanged(state: Int) {
-                val event: MutableMap<String, Any> = HashMap()
+                val event: MutableMap<String, Any?> = HashMap()
                 when(state){
                     Player.STATE_READY -> {
-                            readyToPlay = true
+//                            readyToPlay = true
                         event["statusEvent"] = mapOf("playerStatus" to "state_ready")
                         event["playerReady"] = readyToPlay
                         event["duration"] = exoplayer!!.duration
+                        event["quality"] = quality
+                        Log.d("bufferingData:::::::", "$quality")
+
 
                     }
                     Player.STATE_ENDED -> {
@@ -141,6 +179,7 @@ class ExoPlayerIm {
                     }
                     Player.STATE_BUFFERING -> {
                         event["statusEvent"] = mapOf("playerStatus" to "state_buffering")
+                        event["playerReady"] = false
                         event["percentageBuffered"] = exoplayer!!.bufferedPercentage
                         Log.d("bufferingData", exoplayer!!.bufferedPercentage.toString())
                     }
@@ -148,6 +187,7 @@ class ExoPlayerIm {
                     Player.STATE_IDLE -> {
                         event["statusEvent"] = mapOf("playerStatus" to "state_idle")
                     }
+
                 }
 
 
@@ -157,6 +197,7 @@ class ExoPlayerIm {
 
 
             }
+
 
             override fun onVideoSizeChanged(videoSize: VideoSize): Unit{
                 val event: MutableMap<String, Any> = HashMap()

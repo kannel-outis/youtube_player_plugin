@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-
 import 'utils/enums.dart';
 
 // ignore: avoid_classes_with_only_static_members
@@ -16,20 +15,26 @@ class YoutubePlayerMethodCall {
 
   static Future<int> initSurface() async {
     final textureId = await _channel.invokeMethod("initSurface");
-    print("${textureId.toString()}:::::::::::::::");
     return textureId as int;
   }
 
-  static Future<bool> initPlayer(
-      {required String audioLink, required String videoLink}) async {
+  static Future<Map<String, dynamic>> initPlayer(
+      {String? audioLink,
+      String? videoLink,
+      String? youtubeLink,
+      required String quality}) async {
     final readyToPlay = await _channel.invokeMethod(
       "initPlayer",
       {
         "audio": audioLink,
         "video": videoLink,
+        "youtubeLink": youtubeLink,
+        "quality": quality,
       },
-    ) as bool;
-    return readyToPlay;
+    );
+    return (readyToPlay as Map).map(
+      (key, value) => MapEntry(key as String, value),
+    );
   }
 
   static Future<void> dispose() async {
@@ -56,7 +61,6 @@ class YoutubePlayerMethodCall {
         break;
       case ChangeYoutubePlayeStatus.pause:
         final status = await _channel.invokeMethod("pause");
-        print(status);
         if (status["status"] == "paused") {
           youtubeStatus = YoutubePlayerStatus.paused;
         }
@@ -85,5 +89,21 @@ class YoutubePlayerMethodCall {
 
   static Future<int> bufferedPosition() async {
     return await _channel.invokeMethod("bufferedPosition") as int;
+  }
+
+  static Future<void> videoQualityChange(
+      {String? audioLink,
+      String? videoLink,
+      String? youtubeLink,
+      required String quality}) async {
+    await _channel.invokeMethod(
+      "videoQualityChange",
+      {
+        "audio": audioLink,
+        "video": videoLink,
+        "youtubeLink": youtubeLink,
+        "quality": quality,
+      },
+    );
   }
 }
