@@ -49,8 +49,12 @@ class _PlayerState extends State<Player> {
   @override
   void didUpdateWidget(covariant Player oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!widget.controller.isDisposed) {
+    if (!oldWidget.controller.isDisposed) {
       oldWidget.controller.removeListener(_listener);
+      _textureId = widget.controller.textureId;
+      setS();
+      widget.controller.addListener(_listener);
+    } else {
       _textureId = widget.controller.textureId;
       setS();
       widget.controller.addListener(_listener);

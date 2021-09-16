@@ -132,6 +132,13 @@ class _YoutubePlayerState extends State<YoutubePlayer>
         widget.loadingWidth != oldWidget.loadingWidth) {
       setState(() {});
     }
+    if (oldWidget.controller.videoId != widget.controller.videoId) {
+      oldWidget.controller.removeListener(_listener);
+      oldWidget.controller.dispose();
+      widget.controller
+        ..initPlayer()
+        ..addListener(_listener);
+    }
   }
 
   void _showProgress(BuildContext context) {
