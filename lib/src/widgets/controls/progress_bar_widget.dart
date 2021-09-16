@@ -34,8 +34,8 @@ class ProgressSliderWidget extends StatelessWidget {
                 controller.value.duration.inMilliseconds
             : 0.0,
         progressBarColor: colors!.progressColor!,
-        barColor: colors!.barColor!.withOpacity(.2),
-        bufferedColor: colors!.bufferedColor!.withOpacity(.4),
+        barColor: colors!.barColor!,
+        bufferedColor: colors!.bufferedColor!,
         thumbColor: colors!.thumbColor!,
         seekTo: (value) {
           controller.seekTo(
