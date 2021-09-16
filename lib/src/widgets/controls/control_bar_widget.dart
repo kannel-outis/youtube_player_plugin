@@ -46,7 +46,9 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
     setState(() => {});
 
     if (widget.controller.value.youtubePlayerStatus ==
-        YoutubePlayerStatus.ended) _anime.reverse();
+            YoutubePlayerStatus.ended ||
+        widget.controller.value.youtubePlayerStatus !=
+            YoutubePlayerStatus.playing) _anime.reverse();
   }
 
   @override
