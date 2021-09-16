@@ -40,9 +40,9 @@ class YoutubePlayer extends StatefulWidget {
   YoutubePlayer.withControls({
     Key? key,
     required this.controller,
-    required Widget toolBarControl,
-    required Widget controls,
-    required Widget progress,
+    Widget? toolBarControl,
+    Widget? controls,
+    Widget? progress,
     this.hideProgressThumb = false,
     this.completelyHideProgressBar = false,
     this.size,
