@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player/src/controller.dart';
 import 'package:youtube_player/src/utils/utils.dart';
@@ -15,11 +16,13 @@ class _PlayerState extends State<Player> {
   void setS() => setState(() {});
 
   void _listener() {
-    print(widget.controller.value.position);
-    print(widget.controller.value.duration);
-    print(widget.controller.value.youtubePlayerStatus);
-    print(widget.controller.value.quality);
-    print(widget.controller.value.size);
+    if (kDebugMode) {
+      print(widget.controller.value.position);
+      print(widget.controller.value.duration);
+      print(widget.controller.value.youtubePlayerStatus);
+      print(widget.controller.value.quality);
+      print(widget.controller.value.size);
+    }
 
     if (!mounted) return;
     if (widget.controller.textureId != _textureId) {

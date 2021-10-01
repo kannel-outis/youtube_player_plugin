@@ -18,7 +18,6 @@ class ControlBarwidget extends StatefulWidget {
 class _ControlBarwidgetState extends State<ControlBarwidget>
     with SingleTickerProviderStateMixin {
   late final AnimationController _anime;
-  // bool? _show;
 
   bool? shouldPlay;
   @override
@@ -43,12 +42,10 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
     super.didUpdateWidget(oldWidget);
     shouldPlay = widget.controller.value.youtubePlayerStatus ==
         YoutubePlayerStatus.paused;
-    setState(() => {});
+    // setState(() => {});
 
     if (widget.controller.value.youtubePlayerStatus ==
-            YoutubePlayerStatus.ended ||
-        widget.controller.value.youtubePlayerStatus !=
-            YoutubePlayerStatus.playing) _anime.reverse();
+        YoutubePlayerStatus.ended) _anime.reverse();
   }
 
   @override
@@ -87,7 +84,6 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                           );
                           if (widget.controller.value.youtubePlayerStatus ==
                               YoutubePlayerStatus.ended) _anime.forward();
-                          widget.controller.play();
                         },
                         child: Center(
                           child: SizedBox(
@@ -168,7 +164,6 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                                   .round(),
                             ),
                           );
-                          widget.controller.play();
                         },
                         child: Center(
                           child: SizedBox(

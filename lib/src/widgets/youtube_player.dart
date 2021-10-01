@@ -23,6 +23,7 @@ class YoutubePlayer extends StatefulWidget {
   final Widget? timeStampAndToggleWidget;
   final bool hideProgressThumb;
   final double loadingWidth;
+  final bool fullScreenOnRotation;
 
   YoutubePlayer({
     Key? key,
@@ -30,6 +31,7 @@ class YoutubePlayer extends StatefulWidget {
     this.onVisibilityChange,
     this.onVideoQualityChange,
     this.size,
+    this.fullScreenOnRotation = false,
     this.loadingWidth = 17,
     this.timeStampAndToggleWidget,
     this.completelyHideProgressBar = false,
@@ -46,6 +48,7 @@ class YoutubePlayer extends StatefulWidget {
     this.hideProgressThumb = false,
     this.completelyHideProgressBar = false,
     this.size,
+    this.fullScreenOnRotation = false,
     this.loadingWidth = 17,
     this.timeStampAndToggleWidget,
     this.onVisibilityChange,
@@ -79,8 +82,8 @@ class _YoutubePlayerState extends State<YoutubePlayer>
     super.initState();
     quality = widget.controller.value.quality;
     widget.controller
-      ..initPlayer()
-      ..addListener(_listener);
+      ..addListener(_listener)
+      ..initPlayer();
     _animeController = AnimationController(
       vsync: this,
       duration: _duration,
@@ -129,15 +132,16 @@ class _YoutubePlayerState extends State<YoutubePlayer>
     if (oldWidget.completelyHideProgressBar !=
             widget.completelyHideProgressBar ||
         oldWidget.hideProgressThumb != widget.hideProgressThumb ||
-        widget.loadingWidth != oldWidget.loadingWidth) {
+        widget.loadingWidth != oldWidget.loadingWidth ||
+        widget.fullScreenOnRotation != oldWidget.fullScreenOnRotation) {
       setState(() {});
     }
     if (oldWidget.controller.videoId != widget.controller.videoId) {
       oldWidget.controller.removeListener(_listener);
       oldWidget.controller.dispose();
       widget.controller
-        ..initPlayer()
-        ..addListener(_listener);
+        ..addListener(_listener)
+        ..initPlayer();
     }
   }
 
@@ -178,12 +182,12 @@ class _YoutubePlayerState extends State<YoutubePlayer>
       stateChange: (b) {
         widget.controller.showControl = b;
         _showProgress(context);
-        setState(() {});
       },
       child: Stack(
         children: [
           //
           _FullScreenOrientation(
+            fullScreenOnRotate: widget.fullScreenOnRotation,
             child: SizedAspectRatioWidget(
               aspectRatio: 16 / 9,
               additionalSize: widget.size != null
@@ -201,6 +205,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
             ),
           ),
           _FullScreenOrientation(
+            fullScreenOnRotate: widget.fullScreenOnRotation,
             child: AnimatedOpacity(
               duration: _duration,
               opacity: _animeController.value,
@@ -217,6 +222,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
             ),
           ),
           _FullScreenOrientation(
+            fullScreenOnRotate: widget.fullScreenOnRotation,
             // change
             child: Column(
               children: [
@@ -308,14 +314,22 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 class _FullScreenOrientation extends StatelessWidget {
   final double? height;
   final double? width;
+  final bool fullScreenOnRotate;
   // ignore: prefer_const_constructors_in_immutables
   _FullScreenOrientation(
-      {Key? key, required Widget child, this.width, this.height})
+      {Key? key,
+      required Widget child,
+      this.width,
+      this.height,
+      required this.fullScreenOnRotate})
       : _child = child,
         super(key: key);
   late final Widget _child;
   @override
   Widget build(BuildContext context) {
+    if (!fullScreenOnRotate) {
+      return _child;
+    }
     if (MediaQuery.of(context).orientation == Orientation.portrait) {
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
 
