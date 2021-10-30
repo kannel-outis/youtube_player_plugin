@@ -31,6 +31,7 @@ class _Testingpage2State extends State<Testingpage2> {
     //   ..initController();
     _controller = YoutubePlayerController.link(
         youtubeLink: "https://www.youtube.com/watch?v=$videoId",
+        // youtubeLink: "https://www.youtube.com/watch?v=unAqKbKbejg",
         quality: YoutubePlayerVideoQuality.quality_144p);
     // https://www.youtube.com/watch?v=X3Ai6osw3Mk
     // https://www.youtube.com/watch?v=r64_50ELf58
@@ -52,6 +53,9 @@ class _Testingpage2State extends State<Testingpage2> {
               //     quality: YoutubePlayerVideoQuality.quality_144p),
               // size: const Size(20, 20),
               // hideProgressThumb: true,
+              toolBarMinimizeAction: () {
+                log("Something Happened");
+              },
               onVideoQualityChange: (quality) {
                 log(quality.qualityToString);
               },

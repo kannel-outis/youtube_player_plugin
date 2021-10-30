@@ -3,7 +3,7 @@ import 'package:youtube_player/src/utils/utils.dart';
 
 import '../../../youtube_player.dart';
 import '../inherited_state.dart';
-import '../progress_slider.dart';
+import 'progress_slider.dart';
 
 class ProgressSliderWidget extends StatefulWidget {
   const ProgressSliderWidget({
