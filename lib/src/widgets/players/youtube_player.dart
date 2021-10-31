@@ -305,7 +305,8 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                   ),
                 ),
               ),
-              if (!widget.completelyHideProgressBar || !showProgress)
+              if (!widget.completelyHideProgressBar ||
+                  showProgress && !isPotrait(context))
                 widget._progress ??
                     ProgressSliderWidget(
                       animeController: _animeController,
