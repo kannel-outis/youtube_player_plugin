@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:youtube_player/src/utils/typedef.dart';
-import 'package:youtube_player/src/utils/utils.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/src/widgets/inherited_state.dart';
 import 'package:youtube_player/src/widgets/players/full_screen_youtube_player.dart';
@@ -173,157 +172,151 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   Widget build(BuildContext context) {
     // widget.controller.showControl = true;
     _showProgress(context);
-    return Align(
-      alignment: Alignment.topLeft,
-      child: SizedBox(
-        width: isPotrait(context) ? null : Utils.blockHeight * 65,
-        child: InheritedState(
-          loadingWidth: widget.loadingWidth,
-          hideProgressThumb: widget.hideProgressThumb,
-          show: widget.controller.controlVisible,
-          showProgress: showProgress,
-          controller: widget.controller,
-          onVisibilityToggle: (newShowState) {
-            widget.controller.showControl = newShowState;
-            widget.onVisibilityChange?.call(widget.controller.controlVisible);
-          },
-          stateChange: (b) {
-            widget.controller.showControl = b;
-            _showProgress(context);
-          },
-          child: Stack(
+    return InheritedState(
+      loadingWidth: widget.loadingWidth,
+      hideProgressThumb: widget.hideProgressThumb,
+      show: widget.controller.controlVisible,
+      showProgress: showProgress,
+      controller: widget.controller,
+      onVisibilityToggle: (newShowState) {
+        widget.controller.showControl = newShowState;
+        widget.onVisibilityChange?.call(widget.controller.controlVisible);
+      },
+      stateChange: (b) {
+        widget.controller.showControl = b;
+        _showProgress(context);
+      },
+      child: Stack(
+        children: [
+          //
+          SizedAspectRatioWidget(
+            aspectRatio: 16 / 9,
+            additionalSize: widget.size != null
+                ? Size(widget.size!.width, widget.size!.height)
+                : const Size(0, 0),
+            child: Container(
+              width: double.infinity,
+              alignment: Alignment.center,
+              color: Colors.black,
+              child: AspectRatio(
+                aspectRatio: widget.controller.value.aspectRatio,
+                child: Player(widget.controller),
+              ),
+            ),
+          ),
+          AnimatedOpacity(
+            duration: _duration,
+            opacity: _animeController.value,
+            child: SizedAspectRatioWidget(
+              aspectRatio: 16 / 9,
+              additionalSize: widget.size != null
+                  ? Size(widget.size!.width, widget.size!.height)
+                  : const Size(0, 0),
+              child: Container(
+                width: double.infinity,
+                color: Colors.black.withOpacity(.3),
+              ),
+            ),
+          ),
+          Column(
             children: [
-              //
-              SizedAspectRatioWidget(
-                aspectRatio: 16 / 9,
-                additionalSize: widget.size != null
-                    ? Size(widget.size!.width, widget.size!.height)
-                    : const Size(0, 0),
-                child: Container(
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  color: Colors.black,
-                  child: AspectRatio(
-                    aspectRatio: widget.controller.value.aspectRatio,
-                    child: Player(widget.controller),
-                  ),
-                ),
-              ),
-              AnimatedOpacity(
-                duration: _duration,
-                opacity: _animeController.value,
-                child: SizedAspectRatioWidget(
-                  aspectRatio: 16 / 9,
-                  additionalSize: widget.size != null
-                      ? Size(widget.size!.width, widget.size!.height)
-                      : const Size(0, 0),
-                  child: Container(
-                    width: double.infinity,
-                    color: Colors.black.withOpacity(.3),
-                  ),
-                ),
-              ),
-              Column(
-                children: [
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onDoubleTap: () {
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onDoubleTap: () {
+                  widget.controller.showControl = false;
+                  _ticker?.cancel();
+                  _ticker = null;
+                  _showProgress(context);
+                  setState(() {});
+                },
+                onTap: () {
+                  setState(() {
+                    if (widget.controller.controlVisible) {
                       widget.controller.showControl = false;
                       _ticker?.cancel();
                       _ticker = null;
                       _showProgress(context);
-                      setState(() {});
-                    },
-                    onTap: () {
-                      setState(() {
-                        if (widget.controller.controlVisible) {
-                          widget.controller.showControl = false;
-                          _ticker?.cancel();
-                          _ticker = null;
-                          _showProgress(context);
-                        } else {
-                          widget.controller.showControl = true;
-                          setShowToFalseAfterTimer(10);
-                          _showProgress(context);
-                        }
-                      });
-                    },
-                    child: SizedAspectRatioWidget(
-                      additionalSize: widget.size != null
-                          ? Size(widget.size!.width, widget.size!.height - 8.5)
-                          // 8.5 for potrait , 85.5 for landscape
-                          : const Size(0, -8.5),
-                      aspectRatio: isPotrait(context) ? 16 / 9 : 16 / 7,
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // tool bar
-                            Expanded(
-                              child: widget._toolBarControl ??
-                                  ToolBarWidget(
-                                    onPressed: widget.toolBarMinimizeAction,
-                                    controller: widget.controller,
-                                    colors: widget.colors,
-                                  ),
-                            ),
-
-                            // control sec
-                            Container(
-                              // margin: const EdgeInsets.only(bottom: 20),
-                              child: widget._controls ??
-                                  ControlBarwidget(
-                                    controller: widget.controller,
-                                    colors: widget.colors,
-                                  ),
-                            ),
-
-                            // bottom buffer, progress, thumb and shit
-
-                            widget.timeStampAndToggleWidget ??
-                                TimeStampAndFullScreenToggleWidget(
-                                  // show: show,
-                                  onOrientationToggle: (isPotrait) {
-                                    full(
-                                      context,
-                                      Material(
-                                        child: FullScreenYoutubePlayer(
-                                          controller: widget.controller,
-                                          colors: widget.colors,
-                                          onVideoQualityChange:
-                                              widget.onVideoQualityChange,
-                                          onVisibilityChange:
-                                              widget.onVisibilityChange,
-                                          timeStampAndToggleWidget:
-                                              widget.timeStampAndToggleWidget,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  animeController: _animeController,
-                                  controller: widget.controller,
-                                  colors: widget.colors,
-                                ),
-                          ],
+                    } else {
+                      widget.controller.showControl = true;
+                      setShowToFalseAfterTimer(10);
+                      _showProgress(context);
+                    }
+                  });
+                },
+                child: SizedAspectRatioWidget(
+                  additionalSize: widget.size != null
+                      ? Size(widget.size!.width, widget.size!.height - 8.5)
+                      // 8.5 for potrait , 85.5 for landscape
+                      : const Size(0, -8.5),
+                  aspectRatio: isPotrait(context) ? 16 / 9 : 16 / 7,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // tool bar
+                        Expanded(
+                          child: widget._toolBarControl ??
+                              ToolBarWidget(
+                                onPressed: widget.toolBarMinimizeAction,
+                                controller: widget.controller,
+                                colors: widget.colors,
+                              ),
                         ),
-                      ),
+
+                        // control sec
+                        Container(
+                          // margin: const EdgeInsets.only(bottom: 20),
+                          child: widget._controls ??
+                              ControlBarwidget(
+                                controller: widget.controller,
+                                colors: widget.colors,
+                              ),
+                        ),
+
+                        // bottom buffer, progress, thumb and shit
+
+                        widget.timeStampAndToggleWidget ??
+                            TimeStampAndFullScreenToggleWidget(
+                              // show: show,
+                              onOrientationToggle: (isPotrait) {
+                                full(
+                                  context,
+                                  Material(
+                                    child: FullScreenYoutubePlayer(
+                                      controller: widget.controller,
+                                      colors: widget.colors,
+                                      onVideoQualityChange:
+                                          widget.onVideoQualityChange,
+                                      onVisibilityChange:
+                                          widget.onVisibilityChange,
+                                      timeStampAndToggleWidget:
+                                          widget.timeStampAndToggleWidget,
+                                    ),
+                                  ),
+                                );
+                              },
+                              animeController: _animeController,
+                              controller: widget.controller,
+                              colors: widget.colors,
+                            ),
+                      ],
                     ),
                   ),
-                  if (!widget.completelyHideProgressBar || showProgress)
-                    widget._progress ??
-                        ProgressSliderWidget(
-                          animeController: _animeController,
-                          colors: widget._colors,
-                          controller: widget.controller,
-                        )
-                  else
-                    const SizedBox(),
-                ],
+                ),
               ),
+              if (!widget.completelyHideProgressBar || !showProgress)
+                widget._progress ??
+                    ProgressSliderWidget(
+                      animeController: _animeController,
+                      colors: widget._colors,
+                      controller: widget.controller,
+                    )
+              else
+                const SizedBox(),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
