@@ -27,9 +27,11 @@ class _ToolBarWidgetState extends State<ToolBarWidget> {
         ? Container(
             // height: 35,
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            // color: Colors.amber,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IconButton(
                   onPressed: widget.onPressed,

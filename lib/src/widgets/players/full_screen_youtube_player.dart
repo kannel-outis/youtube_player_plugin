@@ -271,7 +271,7 @@ class _FullScreenYoutubePlayerState extends State<FullScreenYoutubePlayer>
                   ),
                 ),
               ),
-              if (!widget.completelyHideProgressBar || !showProgress)
+              if (!widget.completelyHideProgressBar && showProgress)
                 widget._progress ??
                     ProgressSliderWidget(
                       animeController: _animeController,

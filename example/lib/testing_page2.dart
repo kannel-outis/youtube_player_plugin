@@ -53,6 +53,7 @@ class _Testingpage2State extends State<Testingpage2> {
               //     quality: YoutubePlayerVideoQuality.quality_144p),
               // size: const Size(20, 20),
               // hideProgressThumb: true,
+              completelyHideProgressBar: true,
               toolBarMinimizeAction: () {
                 log("Something Happened");
               },
