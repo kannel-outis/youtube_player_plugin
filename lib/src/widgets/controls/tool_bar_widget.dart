@@ -8,8 +8,9 @@ import 'package:youtube_player/youtube_player.dart';
 class ToolBarWidget extends StatefulWidget {
   final YoutubePlayerController? controller;
   final YoutubePlayerColors? colors;
+  final VoidCallback? onPressed;
 
-  const ToolBarWidget({Key? key, this.controller, this.colors})
+  const ToolBarWidget({Key? key, this.controller, this.colors, this.onPressed})
       : super(key: key);
 
   @override
@@ -19,12 +20,6 @@ class ToolBarWidget extends StatefulWidget {
 class _ToolBarWidgetState extends State<ToolBarWidget> {
   bool? _show;
 
-  // @override
-  // void didUpdateWidget(covariant ToolBarWidget oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   setState(() {});
-  // }
-
   @override
   Widget build(BuildContext context) {
     _show = InheritedState.of(context).show;
@@ -32,14 +27,19 @@ class _ToolBarWidgetState extends State<ToolBarWidget> {
         ? Container(
             // height: 35,
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            // color: Colors.amber,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.expand_more_outlined,
-                  size: Utils.blockWidth * 4 > 35 ? 35 : Utils.blockWidth * 4,
-                  color: widget.colors!.iconsColor,
+                IconButton(
+                  onPressed: widget.onPressed,
+                  icon: Icon(
+                    Icons.expand_more_outlined,
+                    size: Utils.blockWidth * 4 > 35 ? 35 : Utils.blockWidth * 4,
+                    color: widget.colors!.iconsColor,
+                  ),
                 ),
                 SizedBox(
                   width: Utils.blockWidth * 20,
