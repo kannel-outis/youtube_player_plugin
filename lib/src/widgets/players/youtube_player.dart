@@ -27,6 +27,8 @@ class YoutubePlayer extends StatefulWidget {
   final VoidCallback? toolBarMinimizeAction;
   final VoidCallback? next;
   final VoidCallback? prev;
+  final VoidCallback? next;
+  final VoidCallback? prev;
 
   YoutubePlayer({
     Key? key,
@@ -34,6 +36,8 @@ class YoutubePlayer extends StatefulWidget {
     this.onVisibilityChange,
     this.onVideoQualityChange,
     this.size,
+    this.next,
+    this.prev,
     this.next,
     this.prev,
     this.fullScreenOnRotation = false,
@@ -59,6 +63,8 @@ class YoutubePlayer extends StatefulWidget {
     this.loadingWidth = 17,
     this.timeStampAndToggleWidget,
     this.onVisibilityChange,
+    this.next,
+    this.prev,
     this.next,
     this.prev,
     this.onVideoQualityChange,
@@ -279,6 +285,8 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                                 colors: widget.colors,
                                 nextFunction: widget.next,
                                 prevFunction: widget.prev,
+                                nextFunction: widget.next,
+                                prevFunction: widget.prev,
                               ),
                         ),
 
@@ -300,6 +308,8 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                                           widget.onVisibilityChange,
                                       timeStampAndToggleWidget:
                                           widget.timeStampAndToggleWidget,
+                                      next: widget.next,
+                                      prev: widget.prev,
                                       next: widget.next,
                                       prev: widget.prev,
                                     ),
