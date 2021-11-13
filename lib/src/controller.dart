@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_final_fields, unnecessary_getters_setters
+
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
@@ -97,9 +99,16 @@ class YoutubePlayerController extends ValueNotifier<_YoutubeControllerValue> {
   int? get textureId => _textureId;
   String? get youtubeLink => _youtubeLink;
   String? _youtubeLink;
+
   late final String _audioLink;
   late final String _videoLink;
   late final String _quality;
+
+  bool _isFullscreen = false;
+  bool get isFullscreen => _isFullscreen;
+  set isFullscreen(bool isfullscreen) {
+    _isFullscreen = isfullscreen;
+  }
 
   late final _PlayingFromLinks _playingFromLinks;
 
