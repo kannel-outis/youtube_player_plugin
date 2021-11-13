@@ -9,12 +9,14 @@ class TimeStampAndFullScreenToggleWidget extends StatelessWidget {
   final YoutubePlayerController controller;
   final AnimationController? animeController;
   final YoutubePlayerColors? colors;
+  final Function(bool)? onOrientationToggle;
 
   const TimeStampAndFullScreenToggleWidget({
     Key? key,
     required this.controller,
     this.animeController,
     this.colors,
+    this.onOrientationToggle,
   }) : super(key: key);
 
   void _animateProgress(bool show) {
@@ -86,6 +88,7 @@ class TimeStampAndFullScreenToggleWidget extends StatelessWidget {
                                 DeviceOrientation.landscapeLeft,
                                 DeviceOrientation.landscapeRight,
                               ]);
+                              // full(context, controller);
                             } else {
                               SystemChrome.setEnabledSystemUIOverlays(
                                   SystemUiOverlay.values);
@@ -98,6 +101,9 @@ class TimeStampAndFullScreenToggleWidget extends StatelessWidget {
                                 ],
                               );
                             }
+                            onOrientationToggle?.call(
+                                MediaQuery.of(context).orientation ==
+                                    Orientation.portrait);
                           },
                           child: Icon(
                             MediaQuery.of(context).orientation ==

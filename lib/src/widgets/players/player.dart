@@ -17,11 +17,11 @@ class _PlayerState extends State<Player> {
 
   void _listener() {
     if (kDebugMode) {
-      print(widget.controller.value.position);
-      print(widget.controller.value.duration);
-      print(widget.controller.value.youtubePlayerStatus);
-      print(widget.controller.value.quality);
-      print(widget.controller.value.size);
+      // print(widget.controller.value.position);
+      // print(widget.controller.value.duration);
+      // print(widget.controller.value.youtubePlayerStatus);
+      // print(widget.controller.value.quality);
+      // print(widget.controller.value.size);
     }
 
     if (!mounted) return;

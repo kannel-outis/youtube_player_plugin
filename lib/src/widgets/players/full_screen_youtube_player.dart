@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:youtube_player/src/utils/typedef.dart';
 import 'package:youtube_player/src/utils/youtube_player_colors.dart';
 import 'package:youtube_player/src/widgets/inherited_state.dart';
-import 'package:youtube_player/src/widgets/players/full_screen_youtube_player.dart';
 import 'package:youtube_player/youtube_player.dart';
 import '../controls/control_bar_widget.dart';
 import '../controls/progress_bar_widget.dart';
@@ -14,7 +14,7 @@ import '../time_toggle_widget.dart';
 const _duration = Duration(milliseconds: 100);
 
 // ignore_for_file: must_be_immutable, avoid_init_to_null
-class YoutubePlayer extends StatefulWidget {
+class FullScreenYoutubePlayer extends StatefulWidget {
   final YoutubePlayerController controller;
   final Size? size;
   final OnVisibilityChange? onVisibilityChange;
@@ -25,33 +25,23 @@ class YoutubePlayer extends StatefulWidget {
   final double loadingWidth;
   final bool fullScreenOnRotation;
   final VoidCallback? toolBarMinimizeAction;
-<<<<<<< HEAD
-  final VoidCallback? next;
-  final VoidCallback? prev;
-=======
->>>>>>> e000ca6dba8e2c8400f30407578b552b56e4c4b2
 
-  YoutubePlayer({
+  FullScreenYoutubePlayer({
     Key? key,
     required this.controller,
     this.onVisibilityChange,
     this.onVideoQualityChange,
+    this.toolBarMinimizeAction,
     this.size,
-<<<<<<< HEAD
-    this.next,
-    this.prev,
-=======
->>>>>>> e000ca6dba8e2c8400f30407578b552b56e4c4b2
     this.fullScreenOnRotation = false,
     this.loadingWidth = 17,
     this.timeStampAndToggleWidget,
     this.completelyHideProgressBar = false,
     this.hideProgressThumb = false,
-    this.toolBarMinimizeAction,
     YoutubePlayerColors colors = const YoutubePlayerColors.auto(),
   })  : _colors = colors,
         super(key: key);
-  YoutubePlayer.withControls({
+  FullScreenYoutubePlayer.withControls({
     Key? key,
     required this.controller,
     Widget? toolBarControl,
@@ -65,11 +55,6 @@ class YoutubePlayer extends StatefulWidget {
     this.loadingWidth = 17,
     this.timeStampAndToggleWidget,
     this.onVisibilityChange,
-<<<<<<< HEAD
-    this.next,
-    this.prev,
-=======
->>>>>>> e000ca6dba8e2c8400f30407578b552b56e4c4b2
     this.onVideoQualityChange,
   })  : _toolBarControl = toolBarControl,
         _controls = controls,
@@ -85,10 +70,11 @@ class YoutubePlayer extends StatefulWidget {
   YoutubePlayerColors get colors => _colors;
 
   @override
-  _YoutubePlayerState createState() => _YoutubePlayerState();
+  _FullScreenYoutubePlayerState createState() =>
+      _FullScreenYoutubePlayerState();
 }
 
-class _YoutubePlayerState extends State<YoutubePlayer>
+class _FullScreenYoutubePlayerState extends State<FullScreenYoutubePlayer>
     with SingleTickerProviderStateMixin {
   late AnimationController _animeController;
   bool showProgress = true;
@@ -99,9 +85,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   void initState() {
     super.initState();
     quality = widget.controller.value.quality;
-    widget.controller
-      ..addListener(_listener)
-      ..initPlayer();
+    widget.controller.addListener(_listener);
     _animeController = AnimationController(
       vsync: this,
       duration: _duration,
@@ -143,26 +127,6 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   bool isPotrait(BuildContext context) =>
       MediaQuery.of(context).orientation == Orientation.portrait;
 
-  @override
-  void didUpdateWidget(covariant YoutubePlayer oldWidget) {
-    // TODO: implement didUpdateWidget
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.completelyHideProgressBar !=
-            widget.completelyHideProgressBar ||
-        oldWidget.hideProgressThumb != widget.hideProgressThumb ||
-        widget.loadingWidth != oldWidget.loadingWidth ||
-        widget.fullScreenOnRotation != oldWidget.fullScreenOnRotation) {
-      setState(() {});
-    }
-    if (oldWidget.controller.videoId != widget.controller.videoId) {
-      oldWidget.controller.removeListener(_listener);
-      oldWidget.controller.dispose();
-      widget.controller
-        ..addListener(_listener)
-        ..initPlayer();
-    }
-  }
-
   void _showProgress(BuildContext context) {
     if (!isPotrait(context)) {
       if (widget.controller.controlVisible == true) {
@@ -179,7 +143,6 @@ class _YoutubePlayerState extends State<YoutubePlayer>
   void dispose() {
     _ticker?.cancel();
     _ticker = null;
-    widget.controller.dispose();
     super.dispose();
   }
 
@@ -203,34 +166,21 @@ class _YoutubePlayerState extends State<YoutubePlayer>
       },
       child: Stack(
         children: [
-          //
-          SizedAspectRatioWidget(
-            aspectRatio: 16 / 9,
-            additionalSize: widget.size != null
-                ? Size(widget.size!.width, widget.size!.height)
-                : const Size(0, 0),
-            child: Container(
-              width: double.infinity,
-              alignment: Alignment.center,
-              color: Colors.black,
-              child: AspectRatio(
-                aspectRatio: widget.controller.value.aspectRatio,
-                child: Player(widget.controller),
-              ),
+          Container(
+            width: double.infinity,
+            alignment: Alignment.center,
+            color: Colors.black,
+            child: AspectRatio(
+              aspectRatio: widget.controller.value.aspectRatio,
+              child: Player(widget.controller),
             ),
           ),
           AnimatedOpacity(
             duration: _duration,
             opacity: _animeController.value,
-            child: SizedAspectRatioWidget(
-              aspectRatio: 16 / 9,
-              additionalSize: widget.size != null
-                  ? Size(widget.size!.width, widget.size!.height)
-                  : const Size(0, 0),
-              child: Container(
-                width: double.infinity,
-                color: Colors.black.withOpacity(.3),
-              ),
+            child: Container(
+              width: double.infinity,
+              color: Colors.black.withOpacity(.3),
             ),
           ),
           Column(
@@ -273,7 +223,22 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                         Expanded(
                           child: widget._toolBarControl ??
                               ToolBarWidget(
-                                onPressed: widget.toolBarMinimizeAction,
+                                onPressed: () {
+                                  Navigator.pop(context);
+
+                                  SystemChrome.setEnabledSystemUIOverlays(
+                                      SystemUiOverlay.values);
+                                  SystemChrome.setPreferredOrientations(
+                                    const [
+                                      DeviceOrientation.portraitUp,
+                                      DeviceOrientation.portraitDown,
+                                      DeviceOrientation.landscapeLeft,
+                                      DeviceOrientation.landscapeRight,
+                                    ],
+                                  );
+
+                                  widget.toolBarMinimizeAction?.call();
+                                },
                                 controller: widget.controller,
                                 colors: widget.colors,
                               ),
@@ -286,11 +251,6 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                               ControlBarwidget(
                                 controller: widget.controller,
                                 colors: widget.colors,
-<<<<<<< HEAD
-                                nextFunction: widget.next,
-                                prevFunction: widget.prev,
-=======
->>>>>>> e000ca6dba8e2c8400f30407578b552b56e4c4b2
                               ),
                         ),
 
@@ -298,29 +258,10 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 
                         widget.timeStampAndToggleWidget ??
                             TimeStampAndFullScreenToggleWidget(
-                              // show: show,
-                              onOrientationToggle: (isPotrait) {
-                                full(
-                                  context,
-                                  Material(
-                                    child: FullScreenYoutubePlayer(
-                                      controller: widget.controller,
-                                      colors: widget.colors,
-                                      onVideoQualityChange:
-                                          widget.onVideoQualityChange,
-                                      onVisibilityChange:
-                                          widget.onVisibilityChange,
-                                      timeStampAndToggleWidget:
-                                          widget.timeStampAndToggleWidget,
-<<<<<<< HEAD
-                                      next: widget.next,
-                                      prev: widget.prev,
-=======
->>>>>>> e000ca6dba8e2c8400f30407578b552b56e4c4b2
-                                    ),
-                                  ),
-                                );
+                              onOrientationToggle: (isPo) {
+                                Navigator.pop(context);
                               },
+                              // show: show,
                               animeController: _animeController,
                               controller: widget.controller,
                               colors: widget.colors,
@@ -330,8 +271,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                   ),
                 ),
               ),
-              if (!widget.completelyHideProgressBar ||
-                  showProgress && !isPotrait(context))
+              if (!widget.completelyHideProgressBar && showProgress)
                 widget._progress ??
                     ProgressSliderWidget(
                       animeController: _animeController,
@@ -347,53 +287,3 @@ class _YoutubePlayerState extends State<YoutubePlayer>
     );
   }
 }
-
-Future<void> full(BuildContext context, Widget child) async {
-  await Navigator.of(context).push(
-    PageRouteBuilder(
-      opaque: false,
-      settings: const RouteSettings(),
-      pageBuilder: (
-        BuildContext context,
-        Animation<double> animation,
-        Animation<double> secondaryAnimation,
-      ) {
-        return child;
-      },
-    ),
-  );
-}
-
-// class _FullScreenOrientation extends StatelessWidget {
-//   final double? height;
-//   final double? width;
-//   final bool fullScreenOnRotate;
-//   // ignore: prefer_const_constructors_in_immutables
-//   _FullScreenOrientation(
-//       {Key? key,
-//       required Widget child,
-//       this.width,
-//       this.height,
-//       required this.fullScreenOnRotate})
-//       : _child = child,
-//         super(key: key);
-//   late final Widget _child;
-//   @override
-//   Widget build(BuildContext context) {
-//     if (!fullScreenOnRotate) {
-//       return _child;
-//     }
-//     if (MediaQuery.of(context).orientation == Orientation.portrait) {
-//       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-
-//       return _child;
-//     } else {
-//       SystemChrome.setEnabledSystemUIOverlays([]);
-//       return SizedBox(
-//         height: height ?? MediaQuery.of(context).size.height,
-//         width: width ?? MediaQuery.of(context).size.width,
-//         child: _child,
-//       );
-//     }
-//   }
-// }
