@@ -7,8 +7,15 @@ import 'package:youtube_player/youtube_player.dart';
 class ControlBarwidget extends StatefulWidget {
   final YoutubePlayerController controller;
   final YoutubePlayerColors? colors;
+  final VoidCallback? nextFunction;
+  final VoidCallback? prevFunction;
 
-  const ControlBarwidget({Key? key, required this.controller, this.colors})
+  const ControlBarwidget(
+      {Key? key,
+      required this.controller,
+      this.colors,
+      this.nextFunction,
+      this.prevFunction})
       : super(key: key);
 
   @override
@@ -51,6 +58,7 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
   @override
   Widget build(BuildContext context) {
     final _inheritedState = InheritedState.of(context);
+
     return Expanded(
       child: Stack(
         alignment: Alignment.center,
@@ -58,11 +66,13 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
           if (_inheritedState.show)
             Container(
               // color: Colors.pink,
-              width: Utils.blockWidth * 50,
-              constraints: BoxConstraints(
-                maxWidth: Utils.blockWidth * 60 > 350 ? 300 : 200,
-                // minWidth: 250,
-              ),
+              width: _inheritedState.controller!.isFullscreen
+                  ? Utils.blockWidth * 100
+                  : Utils.blockWidth * 80,
+              // constraints: BoxConstraints(
+              //   maxWidth: Utils.blockWidth * 60 > 350 ? 300 : 200,
+              //   // minWidth: 250,
+              // ),
               child: Center(
                 child: InkWell(
                   onTap: () {
@@ -71,6 +81,22 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      InkWell(
+                        onTap: widget.prevFunction,
+                        child: Center(
+                          child: SizedBox(
+                            child: Icon(
+                              Icons.skip_previous,
+                              size: Utils.blockWidth * 7 > 50
+                                  ? 50
+                                  : Utils.blockWidth * 7,
+                              color: widget.prevFunction == null
+                                  ? Colors.grey.withOpacity(.6)
+                                  : widget.colors!.iconsColor,
+                            ),
+                          ),
+                        ),
+                      ),
                       InkWell(
                         onTap: () {
                           widget.controller.seekTo(
@@ -102,7 +128,13 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                           child: widget.controller.value.buffering == true ||
                                   widget.controller.value.youtubePlayerStatus ==
                                       YoutubePlayerStatus.notInitialized
-                              ? const SizedBox()
+                              ? Icon(
+                                  Icons.ac_unit,
+                                  color: Colors.transparent,
+                                  size: Utils.blockWidth * 10 > 70
+                                      ? 70
+                                      : Utils.blockWidth * 10,
+                                )
                               : widget.controller.value.youtubePlayerStatus !=
                                       YoutubePlayerStatus.ended
                                   ? InkWell(
@@ -127,9 +159,9 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                                         progress: _anime,
                                         icon: AnimatedIcons.play_pause,
                                         color: widget.colors!.iconsColor,
-                                        size: Utils.blockWidth * 8.5 > 55
-                                            ? 55
-                                            : Utils.blockWidth * 8.5,
+                                        size: Utils.blockWidth * 10 > 70
+                                            ? 70
+                                            : Utils.blockWidth * 10,
                                       ),
                                     )
                                   : InkWell(
@@ -146,9 +178,9 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                                       },
                                       child: Icon(
                                         Icons.replay,
-                                        size: Utils.blockWidth * 8.5 > 55
-                                            ? 55
-                                            : Utils.blockWidth * 8.5,
+                                        size: Utils.blockWidth * 10 > 70
+                                            ? 70
+                                            : Utils.blockWidth * 10,
                                       ),
                                     ),
                         ),
@@ -173,6 +205,22 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                                   ? 50
                                   : Utils.blockWidth * 7,
                               color: widget.colors!.iconsColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: widget.nextFunction,
+                        child: Center(
+                          child: SizedBox(
+                            child: Icon(
+                              Icons.skip_next,
+                              size: Utils.blockWidth * 7 > 50
+                                  ? 50
+                                  : Utils.blockWidth * 7,
+                              color: widget.nextFunction == null
+                                  ? Colors.grey.withOpacity(.6)
+                                  : widget.colors!.iconsColor,
                             ),
                           ),
                         ),

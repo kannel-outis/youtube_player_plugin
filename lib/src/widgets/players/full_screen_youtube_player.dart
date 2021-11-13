@@ -25,11 +25,15 @@ class FullScreenYoutubePlayer extends StatefulWidget {
   final double loadingWidth;
   final bool fullScreenOnRotation;
   final VoidCallback? toolBarMinimizeAction;
+  final VoidCallback? next;
+  final VoidCallback? prev;
 
   FullScreenYoutubePlayer({
     Key? key,
     required this.controller,
     this.onVisibilityChange,
+    this.next,
+    this.prev,
     this.onVideoQualityChange,
     this.toolBarMinimizeAction,
     this.size,
@@ -54,6 +58,8 @@ class FullScreenYoutubePlayer extends StatefulWidget {
     this.fullScreenOnRotation = false,
     this.loadingWidth = 17,
     this.timeStampAndToggleWidget,
+    this.next,
+    this.prev,
     this.onVisibilityChange,
     this.onVideoQualityChange,
   })  : _toolBarControl = toolBarControl,
@@ -85,6 +91,7 @@ class _FullScreenYoutubePlayerState extends State<FullScreenYoutubePlayer>
   void initState() {
     super.initState();
     quality = widget.controller.value.quality;
+    widget.controller.isFullscreen = true;
     widget.controller.addListener(_listener);
     _animeController = AnimationController(
       vsync: this,
@@ -143,6 +150,7 @@ class _FullScreenYoutubePlayerState extends State<FullScreenYoutubePlayer>
   void dispose() {
     _ticker?.cancel();
     _ticker = null;
+    widget.controller.isFullscreen = false;
     super.dispose();
   }
 
@@ -251,6 +259,8 @@ class _FullScreenYoutubePlayerState extends State<FullScreenYoutubePlayer>
                               ControlBarwidget(
                                 controller: widget.controller,
                                 colors: widget.colors,
+                                nextFunction: widget.next,
+                                prevFunction: widget.prev,
                               ),
                         ),
 

@@ -28,7 +28,7 @@ class _ToolBarWidgetState extends State<ToolBarWidget> {
             // height: 35,
             width: double.infinity,
             // color: Colors.amber,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,11 +63,11 @@ class _ToolBarWidgetState extends State<ToolBarWidget> {
                         ),
                       ),
                       const Expanded(child: SizedBox()),
-                      InkWell(
-                        onTap: () {
+                      IconButton(
+                        onPressed: () {
                           InheritedState.of(context).stateChange?.call(false);
                         },
-                        child: Icon(
+                        icon: Icon(
                           Icons.close_outlined,
                           size: Utils.blockWidth * 4 > 35
                               ? 35

@@ -25,11 +25,10 @@ class YoutubePlayer extends StatefulWidget {
   final double loadingWidth;
   final bool fullScreenOnRotation;
   final VoidCallback? toolBarMinimizeAction;
-<<<<<<< HEAD
   final VoidCallback? next;
   final VoidCallback? prev;
-=======
->>>>>>> e000ca6dba8e2c8400f30407578b552b56e4c4b2
+  final VoidCallback? next;
+  final VoidCallback? prev;
 
   YoutubePlayer({
     Key? key,
@@ -37,11 +36,10 @@ class YoutubePlayer extends StatefulWidget {
     this.onVisibilityChange,
     this.onVideoQualityChange,
     this.size,
-<<<<<<< HEAD
     this.next,
     this.prev,
-=======
->>>>>>> e000ca6dba8e2c8400f30407578b552b56e4c4b2
+    this.next,
+    this.prev,
     this.fullScreenOnRotation = false,
     this.loadingWidth = 17,
     this.timeStampAndToggleWidget,
@@ -65,11 +63,10 @@ class YoutubePlayer extends StatefulWidget {
     this.loadingWidth = 17,
     this.timeStampAndToggleWidget,
     this.onVisibilityChange,
-<<<<<<< HEAD
     this.next,
     this.prev,
-=======
->>>>>>> e000ca6dba8e2c8400f30407578b552b56e4c4b2
+    this.next,
+    this.prev,
     this.onVideoQualityChange,
   })  : _toolBarControl = toolBarControl,
         _controls = controls,
@@ -185,7 +182,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 
   @override
   Widget build(BuildContext context) {
-    // widget.controller.showControl = true;
+    widget.controller.showControl = true;
     _showProgress(context);
     return InheritedState(
       loadingWidth: widget.loadingWidth,
@@ -286,11 +283,10 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                               ControlBarwidget(
                                 controller: widget.controller,
                                 colors: widget.colors,
-<<<<<<< HEAD
                                 nextFunction: widget.next,
                                 prevFunction: widget.prev,
-=======
->>>>>>> e000ca6dba8e2c8400f30407578b552b56e4c4b2
+                                nextFunction: widget.next,
+                                prevFunction: widget.prev,
                               ),
                         ),
 
@@ -312,11 +308,10 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                                           widget.onVisibilityChange,
                                       timeStampAndToggleWidget:
                                           widget.timeStampAndToggleWidget,
-<<<<<<< HEAD
                                       next: widget.next,
                                       prev: widget.prev,
-=======
->>>>>>> e000ca6dba8e2c8400f30407578b552b56e4c4b2
+                                      next: widget.next,
+                                      prev: widget.prev,
                                     ),
                                   ),
                                 );

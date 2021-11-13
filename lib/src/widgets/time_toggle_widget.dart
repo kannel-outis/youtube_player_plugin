@@ -90,6 +90,7 @@ class TimeStampAndFullScreenToggleWidget extends StatelessWidget {
                               ]);
                               // full(context, controller);
                             } else {
+                              controller.isFullscreen = false;
                               SystemChrome.setEnabledSystemUIOverlays(
                                   SystemUiOverlay.values);
                               SystemChrome.setPreferredOrientations(
@@ -110,9 +111,9 @@ class TimeStampAndFullScreenToggleWidget extends StatelessWidget {
                                     Orientation.portrait
                                 ? Icons.fullscreen
                                 : Icons.fullscreen_exit,
-                            size: Utils.blockWidth * 3.5 > 30
-                                ? 30
-                                : Utils.blockWidth * 3.5,
+                            size: Utils.blockWidth * 4 > 40
+                                ? 40
+                                : Utils.blockWidth * 4,
                             color: colors!.iconsColor!.withOpacity(.8),
                           ),
                           // color: colors!.iconsColor!.withOpacity(.8),
