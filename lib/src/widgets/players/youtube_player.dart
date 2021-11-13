@@ -176,7 +176,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
 
   @override
   Widget build(BuildContext context) {
-    widget.controller.showControl = true;
+    // widget.controller.showControl = true;
     _showProgress(context);
     return InheritedState(
       loadingWidth: widget.loadingWidth,
