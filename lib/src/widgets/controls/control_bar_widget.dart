@@ -125,19 +125,25 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                       ),
                       Center(
                         child: SizedBox(
-                          child: widget.controller.value.buffering == true ||
-                                  widget.controller.value.youtubePlayerStatus ==
-                                      YoutubePlayerStatus.notInitialized
-                              ? Icon(
-                                  Icons.ac_unit,
-                                  color: Colors.transparent,
-                                  size: Utils.blockWidth * 10 > 70
-                                      ? 70
-                                      : Utils.blockWidth * 10,
-                                )
-                              : widget.controller.value.youtubePlayerStatus !=
-                                      YoutubePlayerStatus.ended
-                                  ? InkWell(
+                            child: widget.controller.value.buffering == true ||
+                                    widget.controller.value
+                                            .youtubePlayerStatus ==
+                                        YoutubePlayerStatus.notInitialized ||
+                                    widget.controller.value
+                                            .youtubePlayerStatus ==
+                                        YoutubePlayerStatus.ended
+                                ? Icon(
+                                    Icons.ac_unit,
+                                    color: Colors.transparent,
+                                    size: Utils.blockWidth * 10 > 70
+                                        ? 70
+                                        : Utils.blockWidth * 10,
+                                  )
+                                : Offstage(
+                                    offstage: widget.controller.value
+                                            .youtubePlayerStatus ==
+                                        YoutubePlayerStatus.ended,
+                                    child: InkWell(
                                       onTap: () {
                                         if (widget.controller.value
                                                     .youtubePlayerStatus ==
@@ -163,27 +169,8 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
                                             ? 70
                                             : Utils.blockWidth * 10,
                                       ),
-                                    )
-                                  : InkWell(
-                                      onTap: () {
-                                        widget.controller.seekTo(
-                                          Duration(
-                                            milliseconds: (const Duration()
-                                                    .inMilliseconds)
-                                                .round(),
-                                          ),
-                                        );
-                                        _anime.forward();
-                                        widget.controller.play();
-                                      },
-                                      child: Icon(
-                                        Icons.replay,
-                                        size: Utils.blockWidth * 10 > 70
-                                            ? 70
-                                            : Utils.blockWidth * 10,
-                                      ),
                                     ),
-                        ),
+                                  )),
                       ),
                       InkWell(
                         onTap: () {
@@ -245,6 +232,25 @@ class _ControlBarwidgetState extends State<ControlBarwidget>
             )
           else
             const SizedBox(),
+          Offstage(
+            offstage: widget.controller.value.youtubePlayerStatus !=
+                YoutubePlayerStatus.ended,
+            child: InkWell(
+              onTap: () {
+                widget.controller.seekTo(
+                  Duration(
+                    milliseconds: (const Duration().inMilliseconds).round(),
+                  ),
+                );
+                _anime.forward();
+                widget.controller.play();
+              },
+              child: Icon(
+                Icons.replay,
+                size: Utils.blockWidth * 10 > 70 ? 70 : Utils.blockWidth * 10,
+              ),
+            ),
+          ),
         ],
       ),
     );

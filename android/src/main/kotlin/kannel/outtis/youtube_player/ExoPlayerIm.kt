@@ -1,5 +1,6 @@
 package kannel.outtis.youtube_player;
 
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.util.Log
 import android.view.Surface
@@ -9,15 +10,15 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.MergingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.video.VideoSize
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel.Result
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.upstream.*
+import java.io.File
+import java.io.FileInputStream
 
 
 class ExoPlayerIm {
@@ -27,6 +28,7 @@ class ExoPlayerIm {
         private val eventSink:EventSink = EventSink()
         private var readyToPlay:Boolean = false
         private var quality:String? = null
+        private var duration:Int? = null
 
         fun getExoPlayerInstance():SimpleExoPlayer{
             return exoplayer!!
@@ -34,17 +36,40 @@ class ExoPlayerIm {
 
          fun setUpPlayer(streamLinks:StreamLinks, context:android.content.Context, surfaceManager:SurfaceTextureManagerClass, eventChannel: EventChannel): Boolean{
             exoplayer =  SimpleExoPlayer.Builder(context).build()
+             if (streamLinks.videoLink!!.contains("/storage/")){
+                 val r = MediaMetadataRetriever()
+//                 val fileInput = FileInputStream(streamLinks.videoLink)
+                 r.setDataSource(streamLinks.videoLink)
+                 val durString = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                 duration = durString!!.toInt()
+             }
+
              exoplayer!!.addListener(
-                     ListenerF()
+                     ListenerF(duration)
              )
+             lateinit var mediaSource:MediaSource
             val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
-            val vUri = Uri.parse(streamLinks.videoLink)
-            val aUri  = Uri.parse(streamLinks.audioLink)
-            val vSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
-                MediaItem.fromUri(vUri))
-            val aSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
-                MediaItem.fromUri(aUri))
-            val mediaSource: MediaSource = MergingMediaSource(vSource, aSource)
+//            val vUri = Uri.parse(streamLinks.videoLink)
+//            val aUri  = Uri.parse(streamLinks.audioLink)
+           if(!streamLinks.videoLink!!.contains("/storage/")){
+               val vUri = Uri.parse(streamLinks.videoLink)
+               val aUri  = Uri.parse(streamLinks.audioLink)
+               val vSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
+                       MediaItem.fromUri(vUri))
+               val aSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
+                       MediaItem.fromUri(aUri))
+               mediaSource = MergingMediaSource(vSource, aSource)
+           }else{
+               val vUri = Uri.fromFile(File(streamLinks.videoLink))
+               val spec = DataSpec(vUri)
+               val fileDataSource = FileDataSource()
+               fileDataSource.open(spec)
+               val dataSource = DataSource.Factory { fileDataSource }
+               val vSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSource).createMediaSource(
+                       MediaItem.fromUri(vUri))
+               mediaSource = MergingMediaSource(vSource)
+           }
+
             exoplayer!!.setMediaSource(mediaSource)
              exoplayer!!.prepare()
              readyToPlay = true
@@ -152,8 +177,7 @@ class ExoPlayerIm {
 
 
 
-        private class ListenerF() : Player.Listener{
-
+        private class ListenerF(private val duration:Int?) : Player.Listener{
 
 
 
@@ -165,7 +189,7 @@ class ExoPlayerIm {
 //                            readyToPlay = true
                         event["statusEvent"] = mapOf("playerStatus" to "state_ready")
                         event["playerReady"] = readyToPlay
-                        event["duration"] = exoplayer!!.duration
+                        event["duration"] = duration ?: exoplayer!!.duration
                         event["quality"] = quality
                         Log.d("bufferingData:::::::", "$quality")
 

@@ -31,7 +31,9 @@ class _Testingpage2State extends State<Testingpage2> {
     //   ..initController();
     _controller = YoutubePlayerController.link(
         // youtubeLink: "https://www.youtube.com/watch?v=$videoId",
-        youtubeLink: "https://www.youtube.com/watch?v=WxBN4w4bk-c",
+        // youtubeLink: "https://www.youtube.com/watch?v=WxBN4w4bk-c",
+        youtubeLink:
+            "/storage/emulated/0/Download/Red Notice (2021) (NetNaija.com).mp4",
         quality: YoutubePlayerVideoQuality.quality_144p);
     // https://www.youtube.com/watch?v=X3Ai6osw3Mk
     // https://www.youtube.com/watch?v=r64_50ELf58
@@ -53,7 +55,7 @@ class _Testingpage2State extends State<Testingpage2> {
               //     quality: YoutubePlayerVideoQuality.quality_144p),
               // size: const Size(20, 20),
               // hideProgressThumb: true,
-              completelyHideProgressBar: true,
+              completelyHideProgressBar: false,
               toolBarMinimizeAction: () {
                 log("Something Happened");
               },

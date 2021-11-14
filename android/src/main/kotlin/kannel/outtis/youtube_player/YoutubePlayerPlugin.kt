@@ -67,15 +67,27 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
               val youtubeLink:String? = call.argument<String>("youtubeLink")
               val quality:String? = call.argument<String>("quality")
               if(youtubeLink != null){
-                  YtExtractorClassSingleTonObject.instance.extractFun(youtubeLink, context!!, quality!!){
-                          val links:MutableMap<String, Any?> = HashMap<String, Any?>()
-                          links["audio"] = it.audioLink
-                          links["video"] = it.videoLink
-                          eventChannel = EventChannel(messenger, "youtube-player + $textureId")
+                  if (youtubeLink.contains("/storage/")){
+                      val streamLinks = StreamLinks(audioLink= "",  videoLink = youtubeLink, quality = quality!!);
+                      val links: MutableMap<String, Any?> = HashMap<String, Any?>()
+                      links["audio"] = streamLinks.audioLink
+                      links["video"] = streamLinks.videoLink
+                      eventChannel = EventChannel(messenger, "youtube-player + $textureId")
 
-                          val readyToPlay =  ExoPlayerIm.setUpPlayer(streamLinks = it, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
-                          links["readyToPlay"] = readyToPlay
-                          result.success(links)
+                      val readyToPlay = ExoPlayerIm.setUpPlayer(streamLinks = streamLinks, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
+                      links["readyToPlay"] = readyToPlay
+                      result.success(links)
+                  }else{
+                  YtExtractorClassSingleTonObject.instance.extractFun(youtubeLink, context!!, quality!!) {
+                      val links: MutableMap<String, Any?> = HashMap<String, Any?>()
+                      links["audio"] = it.audioLink
+                      links["video"] = it.videoLink
+                      eventChannel = EventChannel(messenger, "youtube-player + $textureId")
+
+                      val readyToPlay = ExoPlayerIm.setUpPlayer(streamLinks = it, context = context!!, surfaceManager = surfaceManager, eventChannel = eventChannel)
+                      links["readyToPlay"] = readyToPlay
+                      result.success(links)
+                  }
 
                   }
               }else{
