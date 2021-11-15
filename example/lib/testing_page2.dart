@@ -32,8 +32,7 @@ class _Testingpage2State extends State<Testingpage2> {
     _controller = YoutubePlayerController.link(
         // youtubeLink: "https://www.youtube.com/watch?v=$videoId",
         // youtubeLink: "https://www.youtube.com/watch?v=WxBN4w4bk-c",
-        youtubeLink:
-            "/storage/emulated/0/Download/Red Notice (2021) (NetNaija.com).mp4",
+        youtubeLink: "/storage/emulated/0/testing.webm",
         quality: YoutubePlayerVideoQuality.quality_144p);
     // https://www.youtube.com/watch?v=X3Ai6osw3Mk
     // https://www.youtube.com/watch?v=r64_50ELf58

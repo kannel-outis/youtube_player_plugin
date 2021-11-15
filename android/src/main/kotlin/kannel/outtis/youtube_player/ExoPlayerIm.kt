@@ -2,6 +2,9 @@ package kannel.outtis.youtube_player;
 
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Surface
 import com.google.android.exoplayer2.MediaItem
@@ -16,9 +19,12 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel.Result
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.source.ClippingMediaSource
 import com.google.android.exoplayer2.upstream.*
 import java.io.File
 import java.io.FileInputStream
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 
 class ExoPlayerIm {
@@ -28,7 +34,7 @@ class ExoPlayerIm {
         private val eventSink:EventSink = EventSink()
         private var readyToPlay:Boolean = false
         private var quality:String? = null
-        private var duration:Int? = null
+        private var duration:Long? = null
 
         fun getExoPlayerInstance():SimpleExoPlayer{
             return exoplayer!!
@@ -41,7 +47,7 @@ class ExoPlayerIm {
 //                 val fileInput = FileInputStream(streamLinks.videoLink)
                  r.setDataSource(streamLinks.videoLink)
                  val durString = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                 duration = durString!!.toInt()
+                 duration = durString!!.toLong()
              }
 
              exoplayer!!.addListener(
@@ -67,7 +73,16 @@ class ExoPlayerIm {
                val dataSource = DataSource.Factory { fileDataSource }
                val vSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSource).createMediaSource(
                        MediaItem.fromUri(vUri))
-               mediaSource = MergingMediaSource(vSource)
+               val durationUs = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                   Duration.ofMillis(duration!! + 1000)
+               } else {
+                   TODO("VERSION.SDK_INT < O")
+               }
+               mediaSource = ClippingMediaSource(vSource, (TimeUnit.NANOSECONDS.toMicros(durationUs.toNanos())).toLong())
+//               exoplayer!!.createMessage { _, _ -> exoplayer!!.stop() }
+//                       .setPosition(duration!!.toLong())
+//                       .setLooper(Looper.getMainLooper())
+//                       .send()
            }
 
             exoplayer!!.setMediaSource(mediaSource)
@@ -177,7 +192,7 @@ class ExoPlayerIm {
 
 
 
-        private class ListenerF(private val duration:Int?) : Player.Listener{
+        private class ListenerF(private val duration:Long?) : Player.Listener{
 
 
 
