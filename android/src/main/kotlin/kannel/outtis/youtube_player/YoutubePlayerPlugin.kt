@@ -69,7 +69,7 @@ class YoutubePlayerPlugin: FlutterPlugin, MethodCallHandler {
               if(youtubeLink != null){
                   if (youtubeLink.contains("/storage/")){
                       val streamLinks = StreamLinks(audioLink= "",  videoLink = youtubeLink, quality = quality!!);
-                      val links: MutableMap<String, Any?> = HashMap<String, Any?>()
+                      val links: MutableMap<String, Any?> = HashMap()
                       links["audio"] = streamLinks.audioLink
                       links["video"] = streamLinks.videoLink
                       eventChannel = EventChannel(messenger, "youtube-player + $textureId")

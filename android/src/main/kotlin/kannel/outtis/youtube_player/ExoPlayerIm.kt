@@ -2,9 +2,6 @@ package kannel.outtis.youtube_player;
 
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.Surface
 import com.google.android.exoplayer2.MediaItem
@@ -19,12 +16,8 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel.Result
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.source.ClippingMediaSource
 import com.google.android.exoplayer2.upstream.*
 import java.io.File
-import java.io.FileInputStream
-import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 
 class ExoPlayerIm {
@@ -44,7 +37,6 @@ class ExoPlayerIm {
             exoplayer =  SimpleExoPlayer.Builder(context).build()
              if (streamLinks.videoLink!!.contains("/storage/")){
                  val r = MediaMetadataRetriever()
-//                 val fileInput = FileInputStream(streamLinks.videoLink)
                  r.setDataSource(streamLinks.videoLink)
                  val durString = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                  duration = durString!!.toLong()
@@ -55,9 +47,7 @@ class ExoPlayerIm {
              )
              lateinit var mediaSource:MediaSource
             val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
-//            val vUri = Uri.parse(streamLinks.videoLink)
-//            val aUri  = Uri.parse(streamLinks.audioLink)
-           if(!streamLinks.videoLink!!.contains("/storage/")){
+           if(!streamLinks.videoLink.contains("/storage/")){
                val vUri = Uri.parse(streamLinks.videoLink)
                val aUri  = Uri.parse(streamLinks.audioLink)
                val vSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
@@ -73,16 +63,7 @@ class ExoPlayerIm {
                val dataSource = DataSource.Factory { fileDataSource }
                val vSource: ProgressiveMediaSource = ProgressiveMediaSource.Factory(dataSource).createMediaSource(
                        MediaItem.fromUri(vUri))
-               val durationUs = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                   Duration.ofMillis(duration!! + 1000)
-               } else {
-                   TODO("VERSION.SDK_INT < O")
-               }
-               mediaSource = ClippingMediaSource(vSource, (TimeUnit.NANOSECONDS.toMicros(durationUs.toNanos())).toLong())
-//               exoplayer!!.createMessage { _, _ -> exoplayer!!.stop() }
-//                       .setPosition(duration!!.toLong())
-//                       .setLooper(Looper.getMainLooper())
-//                       .send()
+               mediaSource = MergingMediaSource(vSource)
            }
 
             exoplayer!!.setMediaSource(mediaSource)
@@ -118,7 +99,7 @@ class ExoPlayerIm {
 
         fun onVideoQualityChange(streamLinks: StreamLinks):Unit{
             if(exoplayer != null){
-                var position:Long = exoplayer!!.currentPosition
+                val position:Long = exoplayer!!.currentPosition
                 val vUri = Uri.parse(streamLinks.videoLink)
                 val aUri  = Uri.parse(streamLinks.audioLink)
                 val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()

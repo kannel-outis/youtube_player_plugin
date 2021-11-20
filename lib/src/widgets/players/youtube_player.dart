@@ -27,6 +27,7 @@ class YoutubePlayer extends StatefulWidget {
   final VoidCallback? toolBarMinimizeAction;
   final VoidCallback? next;
   final VoidCallback? prev;
+  final VoidCallback? onVideoEnded;
 
   YoutubePlayer({
     Key? key,
@@ -42,6 +43,7 @@ class YoutubePlayer extends StatefulWidget {
     this.completelyHideProgressBar = false,
     this.hideProgressThumb = false,
     this.toolBarMinimizeAction,
+    this.onVideoEnded,
     YoutubePlayerColors colors = const YoutubePlayerColors.auto(),
   })  : _colors = colors,
         super(key: key);
@@ -61,6 +63,7 @@ class YoutubePlayer extends StatefulWidget {
     this.onVisibilityChange,
     this.next,
     this.prev,
+    this.onVideoEnded,
     this.onVideoQualityChange,
   })  : _toolBarControl = toolBarControl,
         _controls = controls,
@@ -124,6 +127,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
       listenerCount = 0;
     } else if (widget.controller.value.youtubePlayerStatus ==
         YoutubePlayerStatus.ended) {
+      widget.onVideoEnded?.call();
       listenerCount++;
       if (listenerCount == 1) {
         widget.controller.showControl = true;
@@ -295,6 +299,7 @@ class _YoutubePlayerState extends State<YoutubePlayer>
                                     child: FullScreenYoutubePlayer(
                                       controller: widget.controller,
                                       colors: widget.colors,
+                                      onVideoEnded: widget.onVideoEnded,
                                       onVideoQualityChange:
                                           widget.onVideoQualityChange,
                                       onVisibilityChange:
