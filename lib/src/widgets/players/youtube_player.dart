@@ -149,7 +149,8 @@ class _YoutubePlayerState extends State<YoutubePlayer>
         widget.fullScreenOnRotation != oldWidget.fullScreenOnRotation) {
       setState(() {});
     }
-    if (oldWidget.controller.videoId != widget.controller.videoId) {
+    if (oldWidget.controller.videoId != widget.controller.videoId ||
+        oldWidget.controller.youtubeLink != widget.controller.youtubeLink) {
       oldWidget.controller.removeListener(_listener);
       oldWidget.controller.dispose();
       widget.controller
